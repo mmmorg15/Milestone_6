@@ -15,10 +15,10 @@ const moods = [
 ];
 
 const resourceCards = [
-  { id: "selfcare", icon: Leaf, title: "Self-Care Tips", color: "text-secondary", bgColor: "bg-secondary/10" },
-  { id: "coping", icon: Lightbulb, title: "Coping Strategies", color: "text-primary", bgColor: "bg-primary/10" },
-  { id: "meditation", icon: Brain, title: "Guided Meditation", color: "text-accent", bgColor: "bg-accent/10" },
-  { id: "journal", icon: BookOpen, title: "Journal & Reflect", color: "text-secondary", bgColor: "bg-secondary/10" },
+  { id: "selfcare", icon: Leaf, title: "Wellness Practices", color: "text-secondary", bgColor: "bg-secondary/10" },
+  { id: "coping", icon: Lightbulb, title: "Coping Techniques", color: "text-primary", bgColor: "bg-primary/10" },
+  { id: "meditation", icon: Brain, title: "Guided Relaxation", color: "text-accent", bgColor: "bg-accent/10" },
+  { id: "journal", icon: BookOpen, title: "Therapeutic Journaling", color: "text-secondary", bgColor: "bg-secondary/10" },
 ];
 
 const moodResourceOrder: Record<string, string[]> = {
@@ -50,20 +50,12 @@ const ForMe = () => {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [journal, setJournal] = useState("");
-  const [showBreathe, setShowBreathe] = useState(true);
-
   // Auto-open mood if linked from home
   useEffect(() => {
     if (searchParams.get("mood") === "true") {
       // Just scroll to mood section
     }
   }, [searchParams]);
-
-  // Breathe animation disappears after one cycle
-  useEffect(() => {
-    const timer = setTimeout(() => setShowBreathe(false), 8000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Journal auto-save
   useEffect(() => {
@@ -84,24 +76,6 @@ const ForMe = () => {
 
   return (
     <PageWrapper>
-      {/* Breathe overlay */}
-      <AnimatePresence>
-        {showBreathe && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            className="fixed inset-0 z-50 bg-background/90 flex flex-col items-center justify-center"
-          >
-            <div className="animate-breathe h-32 w-32 rounded-full bg-primary/20 border-2 border-primary/30" />
-            <p className="mt-6 text-sm text-muted-foreground">Breathe in... and out...</p>
-            <button onClick={() => setShowBreathe(false)} className="mt-4 text-xs text-muted-foreground hover:text-primary">
-              Skip
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Hero */}
       <div className="relative h-48 overflow-hidden">
         <img src={heroForMe} alt="Peaceful forest with morning light" className="w-full h-full object-cover" />
@@ -110,7 +84,7 @@ const ForMe = () => {
           <Link to="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary mb-2 min-h-[44px]">
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </Link>
-          <h1 className="text-xl font-bold text-foreground">This space is for you</h1>
+          <h1 className="text-xl font-bold text-foreground">I Need Help</h1>
         </div>
       </div>
 
@@ -151,13 +125,13 @@ const ForMe = () => {
 
         {/* Talk to someone */}
         <a href="#" className="flex items-center justify-between p-4 bg-accent/10 rounded-xl border border-accent/20 hover:bg-accent/15 transition-colors min-h-[44px]">
-          <span className="text-sm font-semibold text-foreground">Talk to someone</span>
+          <span className="text-sm font-semibold text-foreground">Speak with a Counselor</span>
           <ArrowRight className="h-4 w-4 text-accent" />
         </a>
 
         {/* Resource cards */}
         <section className="space-y-3">
-          <h2 className="text-base font-semibold text-foreground">Resources for you</h2>
+          <h2 className="text-base font-semibold text-foreground">Support Resources</h2>
           <div className="grid grid-cols-2 gap-3">
             {orderedResources.map((card) => (
               <button
@@ -182,7 +156,7 @@ const ForMe = () => {
         <AnimatePresence mode="wait">
           {expandedCard === "selfcare" && (
             <motion.div key="selfcare" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="bg-card rounded-xl border border-border p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">🌿 Self-Care Tips</h3>
+              <h3 className="text-sm font-semibold text-foreground">🌿 Wellness Practices</h3>
               <ul className="space-y-2">
                 {selfCareTips.map((tip, i) => (
                   <li key={i} className="text-sm text-muted-foreground flex gap-2">
@@ -194,7 +168,7 @@ const ForMe = () => {
           )}
           {expandedCard === "coping" && (
             <motion.div key="coping" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="bg-card rounded-xl border border-border p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">💡 Coping Strategies</h3>
+              <h3 className="text-sm font-semibold text-foreground">💡 Coping Techniques</h3>
               <ul className="space-y-2">
                 {copingStrategies.map((tip, i) => (
                   <li key={i} className="text-sm text-muted-foreground flex gap-2">
@@ -206,7 +180,7 @@ const ForMe = () => {
           )}
           {expandedCard === "meditation" && (
             <motion.div key="meditation" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="bg-card rounded-xl border border-border p-5 text-center space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">🧘 Guided Meditation</h3>
+              <h3 className="text-sm font-semibold text-foreground">🧘 Guided Relaxation</h3>
               <div className="animate-breathe h-20 w-20 rounded-full bg-primary/15 border border-primary/20 mx-auto" />
               <p className="text-sm text-muted-foreground">
                 Focus on the circle. Breathe in as it expands, out as it contracts. Let each breath bring you calm.
@@ -215,7 +189,7 @@ const ForMe = () => {
           )}
           {expandedCard === "journal" && (
             <motion.div key="journal" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="bg-card rounded-xl border border-border p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">📝 Journal & Reflect</h3>
+              <h3 className="text-sm font-semibold text-foreground">📝 Therapeutic Journaling</h3>
               <p className="text-xs text-muted-foreground">Write freely. Your thoughts stay on this device.</p>
               <Textarea
                 placeholder="What's on your mind today?"

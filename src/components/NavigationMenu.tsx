@@ -11,7 +11,7 @@ interface NavigationMenuProps {
 const navItems = [
   { icon: Home, label: "Home", description: "Start here", to: "/" },
   { icon: User, label: "Login / Sign Up", description: "Save your progress", to: "/auth" },
-  { icon: Heart, label: "For Me", description: "Get personalized support", to: "/for-me" },
+  { icon: Heart, label: "I Need Help", description: "Get personalized support", to: "/for-me" },
   { icon: HandHeart, label: "For Supporters", description: "Help a loved one", to: "/supporters" },
 ];
 
