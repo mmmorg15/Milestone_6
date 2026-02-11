@@ -8,30 +8,30 @@ import heroSupporters from "@/assets/hero-supporters.jpg";
 
 const overviewCards = [
   {
-    icon: Heart, emoji: "💛", title: "Care for yourself first", color: "text-accent", bgColor: "bg-accent/10",
+    icon: Heart, emoji: "💛", title: "Self-care for caregivers", color: "text-accent", bgColor: "bg-accent/10",
     tips: [
-      "You can't pour from an empty cup — rest is not selfish",
-      "Set boundaries that protect your energy",
-      "Talk to someone about your own feelings too",
-      "Take breaks from caregiving without guilt",
+      "Caregiver burnout is clinically recognized — rest is essential, not optional",
+      "Establish healthy boundaries to preserve your emotional capacity",
+      "Seek peer support or counseling for your own well-being",
+      "Schedule regular respite periods without guilt",
     ],
   },
   {
-    icon: Sprout, emoji: "🌱", title: "Build resilience", color: "text-secondary", bgColor: "bg-secondary/10",
+    icon: Sprout, emoji: "🌱", title: "Building emotional resilience", color: "text-secondary", bgColor: "bg-secondary/10",
     tips: [
-      "Practice grounding techniques daily (deep breathing, walks)",
-      "Maintain your own hobbies and social connections",
-      "Accept that you can't fix everything — presence matters most",
-      "Learn to recognize your own stress signals",
+      "Practice evidence-based grounding techniques (diaphragmatic breathing, mindful walking)",
+      "Maintain your own social connections and personal activities",
+      "Accept limitations — your presence is therapeutic in itself",
+      "Monitor your own stress indicators and warning signs",
     ],
   },
   {
-    icon: Zap, emoji: "💪", title: "Show up stronger", color: "text-primary", bgColor: "bg-primary/10",
+    icon: Zap, emoji: "💪", title: "Effective support strategies", color: "text-primary", bgColor: "bg-primary/10",
     tips: [
-      "Listen without trying to solve the problem",
-      "Small consistent gestures matter more than grand ones",
-      "Educate yourself about what they're going through",
-      "Celebrate small wins together",
+      "Practice active listening without problem-solving",
+      "Consistent, small supportive actions are more effective than sporadic large gestures",
+      "Educate yourself about their condition or diagnosis",
+      "Acknowledge and reinforce incremental progress",
     ],
   },
 ];
@@ -88,8 +88,8 @@ const Supporters = () => {
         <Tabs defaultValue="overview" className="mt-4">
           <TabsList className="w-full grid grid-cols-3 rounded-xl bg-muted h-11">
             <TabsTrigger value="overview" className="rounded-lg text-xs">Overview</TabsTrigger>
-            <TabsTrigger value="whattodo" className="rounded-lg text-xs">What To Do</TabsTrigger>
-            <TabsTrigger value="urgency" className="rounded-lg text-xs">How Urgent?</TabsTrigger>
+            <TabsTrigger value="whattodo" className="rounded-lg text-xs">Communication</TabsTrigger>
+            <TabsTrigger value="urgency" className="rounded-lg text-xs">Risk Assessment</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -138,7 +138,7 @@ const Supporters = () => {
           {/* What To Do Tab */}
           <TabsContent value="whattodo" className="mt-5 space-y-6">
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-              <h3 className="text-base font-semibold text-foreground mb-3">How to have a supportive conversation</h3>
+              <h3 className="text-base font-semibold text-foreground mb-3">Therapeutic Communication Guide</h3>
               <ol className="space-y-3">
                 {[
                   "Choose a quiet, private moment",
@@ -158,7 +158,7 @@ const Supporters = () => {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-              <h3 className="text-base font-semibold text-foreground mb-3">What to say vs. what to avoid</h3>
+              <h3 className="text-base font-semibold text-foreground mb-3">Supportive vs. Harmful Language</h3>
               <div className="space-y-2">
                 {whatToSay.map((pair, i) => (
                   <div key={i} className="grid grid-cols-2 gap-2">

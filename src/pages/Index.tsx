@@ -5,15 +5,15 @@ import PageWrapper from "@/components/PageWrapper";
 import heroHome from "@/assets/hero-home.jpg";
 
 const crisisButtons = [
-  { label: "Call 988 Lifeline", icon: Phone, href: "tel:988", color: "bg-accent/15 text-accent" },
-  { label: "Text '988'", icon: MessageCircle, href: "sms:988", color: "bg-secondary/15 text-secondary" },
-  { label: "More Support", icon: ExternalLink, href: "#", color: "bg-primary/15 text-primary" },
+  { label: "988 Crisis Lifeline", icon: Phone, href: "tel:988", color: "bg-accent/15 text-accent" },
+  { label: "Text Crisis Line", icon: MessageCircle, href: "sms:988", color: "bg-secondary/15 text-secondary" },
+  { label: "Find a Provider", icon: ExternalLink, href: "#", color: "bg-primary/15 text-primary" },
 ];
 
 const quickCards = [
-  { emoji: "🧠", title: "Understand Your Feelings", desc: "Explore what you're experiencing", to: "/for-me", icon: Brain },
-  { emoji: "💙", title: "I'm Struggling", desc: "Get support right now", to: "/for-me?mood=true", icon: Heart },
-  { emoji: "🤝", title: "Worried About Someone", desc: "Learn how to help a loved one", to: "/supporters", icon: HandHeart },
+  { emoji: "🧠", title: "Mental Health Assessment", desc: "Evaluate your current emotional state", to: "/for-me", icon: Brain },
+  { emoji: "💙", title: "I Need Help Now", desc: "Access immediate support resources", to: "/for-me?mood=true", icon: Heart },
+  { emoji: "🤝", title: "Supporting a Loved One", desc: "Caregiver guidance & resources", to: "/supporters", icon: HandHeart },
 ];
 
 const fadeUp = {
