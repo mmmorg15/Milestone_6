@@ -1,6 +1,6 @@
-import { Home, User, Heart, HandHeart, X } from "lucide-react";
+﻿import { Home, User, Heart, HandHeart } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import navMosaic from "@/assets/nav-mosaic.jpg";
 
 interface NavigationMenuProps {
@@ -20,14 +20,7 @@ const NavigationMenu = ({ open, onOpenChange }: NavigationMenuProps) => {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-[300px] bg-background p-0 flex flex-col">
         <SheetHeader className="p-5 pb-3 border-b border-border">
-          <div className="flex items-center justify-between">
-            <SheetTitle className="text-lg font-semibold text-foreground">Welcome</SheetTitle>
-            <SheetClose asChild>
-              <button className="h-11 w-11 flex items-center justify-center rounded-xl hover:bg-muted transition-colors" aria-label="Close menu">
-                <X className="h-5 w-5" />
-              </button>
-            </SheetClose>
-          </div>
+          <SheetTitle className="text-lg font-semibold text-foreground">Welcome</SheetTitle>
         </SheetHeader>
 
         <nav className="flex-1 p-3">

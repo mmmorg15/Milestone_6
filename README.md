@@ -1,73 +1,128 @@
-# Welcome to your Lovable project
+﻿# Havenly Path
 
-## Project info
+Havenly Path is a mental-health support app that helps people check in on mood, journal safely, and access support resources for themselves or for loved ones. The project demonstrates a complete frontend + backend + PostgreSQL workflow with persistent data.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Product Value
+- Gives users a low-friction place to log mood and journal entries.
+- Provides quick access to crisis and support resources.
+- Supports account-based persistence so saved entries belong to the logged-in user.
 
-## How can I edit this code?
+## Tech Stack (By Layer)
+- Frontend: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
+- Backend API: Node.js, Express, dotenv, CORS
+- Database: PostgreSQL (SQL scripts for schema + seed)
+- Tooling: npm, nodemon, psql
 
-There are several ways of editing your application.
+## Architecture
+```mermaid
+flowchart LR
+  A[React Frontend\nfrontend] -->|HTTP /api| B[Express API\nbackend/server.js]
+  B --> C[(PostgreSQL\nmilestone6)]
 
-**Use Lovable**
+  subgraph DB Tables
+    U[users]
+    M[moods]
+    ML[mood_logs]
+    J[journal_entries]
+    R[support_resources]
+  end
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+  C --- U
+  C --- M
+  C --- ML
+  C --- J
+  C --- R
+```
 
-Changes made via Lovable will be committed automatically to this repo.
+## Database Design
+The schema contains 5 tables:
+1. `users`
+2. `moods`
+3. `mood_logs`
+4. `journal_entries`
+5. `support_resources`
 
-**Use your preferred IDE**
+ERD alignment note: the original concept included `users`, `journal_entries`, and `mood_logs`; `moods` and `support_resources` were added to support lookup data/resources and meet the 5-table requirement.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Prerequisites
+- Node.js 18+
+- PostgreSQL installed and running
+- `psql` CLI available in your terminal
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Environment Setup
+From repo root:
 
-Follow these steps:
+```powershell
+Copy-Item backend\.env.example backend\.env
+Copy-Item frontend\.env.example frontend\.env
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+`backend/.env` should point to your local DB credentials (default DB name used here is `milestone6`).
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Recreate Database (Exact Steps)
+From repo root:
 
-# Step 3: Install the necessary dependencies.
-npm i
+```powershell
+cd db
+psql -U postgres -d milestone6 -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+psql -U postgres -d milestone6 -f schema.sql
+psql -U postgres -d milestone6 -f seed.sql
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Quick DB verification:
+
+```powershell
+psql -U postgres -d milestone6 -c "\dt"
+psql -U postgres -d milestone6 -c "SELECT COUNT(*) AS users_count FROM users;"
+psql -U postgres -d milestone6 -c "SELECT COUNT(*) AS moods_count FROM moods;"
+```
+
+## Run the App Locally
+Use two terminals.
+
+Terminal 1 (Backend):
+
+```powershell
+cd backend
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Terminal 2 (Frontend):
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```powershell
+cd frontend
+npm install
+npm run dev
+```
 
-**Use GitHub Codespaces**
+Open the frontend URL shown by Vite (typically `http://localhost:5173`).
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Vertical Slice Verification (Button -> API -> DB -> Persisted)
+This verifies the `Save Journal Entry` and `Save Mood Check-In` flow.
 
-## What technologies are used for this project?
+1. Open `/auth` and sign up or log in.
+2. Confirm top-right shows account name.
+3. Go to `/for-me`.
+4. Choose a mood and click `Save Mood Check-In`.
+5. Expand `Therapeutic Journaling`, type text, click `Save Journal Entry`.
+6. Confirm UI feedback toast appears for each save.
+7. Verify DB rows were inserted:
 
-This project is built with:
+```powershell
+psql -U postgres -d milestone6 -c "SELECT ml.id, u.email, m.code AS mood, ml.logged_at FROM mood_logs ml JOIN users u ON u.id = ml.user_id JOIN moods m ON m.id = ml.mood_id ORDER BY ml.id DESC LIMIT 5;"
+psql -U postgres -d milestone6 -c "SELECT je.id, u.email, je.content, je.created_at FROM journal_entries je JOIN users u ON u.id = je.user_id ORDER BY je.id DESC LIMIT 5;"
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+8. Refresh the page and rerun the SQL queries above; rows remain in DB (persistent after refresh).
 
-## How can I deploy this project?
+## API Endpoints Used
+- `POST /api/auth/signup`
+- `POST /api/auth/login`
+- `POST /api/mood-logs`
+- `POST /api/journal-entries`
+- `GET /api/health`
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Notes / Current Limitations
+- Authentication is sessionless and stored client-side for this milestone.
+- Passwords are stored as plain text for assignment simplicity (not production-safe).
