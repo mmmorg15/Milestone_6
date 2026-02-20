@@ -8,7 +8,7 @@ Havenly Path is a mental-health support app that helps people check in on mood, 
 - Supports account-based persistence so saved entries belong to the logged-in user.
 
 ## Tech Stack (By Layer)
-- Frontend: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
+- Frontend: React, TypeScript, Vite, Tailwind CSS, shadcn ui
 - Backend API: Node.js, Express, dotenv, CORS
 - Database: PostgreSQL (SQL scripts for schema + seed)
 - Tooling: npm, nodemon, psql
