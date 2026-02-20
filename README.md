@@ -1,6 +1,6 @@
-﻿# Havenly Path
+﻿# Description
 
-Havenly Path is a mental-health support app that helps people check in on mood, journal safely, and access support resources for themselves or for loved ones. The project demonstrates a complete frontend + backend + PostgreSQL workflow with persistent data.
+This is a mental-health support app. Its goal is to provide resources for those that are supporting someone dealing with mental health challenges such as being suicidal as well as providing resources to support the struggling individual themself. It allows users them to check in on their mood, journal safely, and access support resources for themselves or for loved ones. The problem that it solves is mainly the lack of easy access to simple and helpful resources and plans that can make a real quick differences in the lives of supporters. The primary user would be someone who is supporting a struggling family member or friend. The project demonstrates a complete frontend + backend + PostgreSQL workflow with persistent data.
 
 ## Product Value
 - Gives users a low-friction place to log mood and journal entries.
@@ -16,7 +16,9 @@ Havenly Path is a mental-health support app that helps people check in on mood, 
 ## Architecture
 ```mermaid
 flowchart LR
-  A[React Frontend\nfrontend] -->|HTTP /api| B[Express API\nbackend/server.js]
+  USER[User] --> A[React Frontend\nfrontend]
+
+  A -->|HTTP /api| B[Express API\nbackend/server.js]
   B --> C[(PostgreSQL\nmilestone6)]
 
   subgraph DB Tables
@@ -33,6 +35,7 @@ flowchart LR
   C --- J
   C --- R
 ```
+
 
 ## Database Design
 The schema contains 5 tables:
