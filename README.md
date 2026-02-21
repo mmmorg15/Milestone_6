@@ -61,13 +61,21 @@ Copy-Item backend\.env.example backend\.env
 Copy-Item frontend\.env.example frontend\.env
 ```
 
+Or in bash:
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
 `backend/.env` should point to your local DB credentials (default DB name used here is `milestone6`).
+(If the .env file in the backend doesn't have your correct DB_PASSWORD and other credentials, it won't work!)
 
 ## Recreate Database (Exact Steps)
 From repo root:
 
 ```powershell
 cd db
+psql -U postgres -c "CREATE DATABASE milestone6;"
 psql -U postgres -d milestone6 -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
 psql -U postgres -d milestone6 -f schema.sql
 psql -U postgres -d milestone6 -f seed.sql
@@ -79,13 +87,14 @@ Quick DB verification:
 psql -U postgres -d milestone6 -c "\dt"
 psql -U postgres -d milestone6 -c "SELECT COUNT(*) AS users_count FROM users;"
 psql -U postgres -d milestone6 -c "SELECT COUNT(*) AS moods_count FROM moods;"
+psql -U postgres -d milestone6 -c "SELECT * FROM users;"
 ```
 
 ## Run the App Locally
 Use two terminals.
 
 Terminal 1 (Backend):
-
+Navigate to the project directory
 ```powershell
 cd backend
 npm install
@@ -93,14 +102,15 @@ npm run dev
 ```
 
 Terminal 2 (Frontend):
-
+Navigate to the project directory
 ```powershell
 cd frontend
 npm install
 npm run dev
 ```
+The frontend installation might take a while. If running dev errors out, try deleting the front-end node_modules and package-lock.json, clearing terminal cache, and re-running the install and run dev commands.
 
-Open the frontend URL shown by Vite (typically `http://localhost:5173`).
+Open the frontend URL shown by Vite (typically `http://localhost:5173` or possibly port 8080).
 
 ## Vertical Slice Verification (Button -> API -> DB -> Persisted)
 This verifies the `Save Journal Entry` and `Save Mood Check-In` flow.
@@ -127,6 +137,3 @@ psql -U postgres -d milestone6 -c "SELECT je.id, u.email, je.content, je.created
 - `POST /api/journal-entries`
 - `GET /api/health`
 
-## Notes / Current Limitations
-- Authentication is sessionless and stored client-side for this milestone.
-- Passwords are stored as plain text for assignment simplicity (not production-safe).
