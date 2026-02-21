@@ -45,11 +45,12 @@ The schema contains 5 tables:
 4. `journal_entries`
 5. `support_resources`
 
-ERD alignment note: the original concept included `users`, `journal_entries`, and `mood_logs`; `moods` and `support_resources` were added to support lookup data/resources and meet the 5-table requirement.
 
 ## Prerequisites
-- Node.js 18+
-- PostgreSQL installed and running
+- Node.js 18+ Installation: https://nodejs.org/en/download
+    - Installation verification command: node -v
+- PostgreSQL installed and running. Installation: https://www.postgresql.org/download/
+    - Installation verification command: psql --version
 - `psql` CLI available in your terminal
 
 ## Environment Setup
