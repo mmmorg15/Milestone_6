@@ -73,7 +73,7 @@ const Supporters = () => {
     <PageWrapper>
       {/* Hero */}
       <div className="relative h-48 overflow-hidden">
-        <img src={heroSupporters} alt="Mountain sunrise" className="w-full h-full object-cover" />
+        <img src={heroSupporters} alt="Mountain sunrise" className="w-full h-full object-cover object-[center_35%]" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <Link to="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary mb-2 min-h-[44px]">
