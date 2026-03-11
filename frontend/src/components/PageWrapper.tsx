@@ -8,9 +8,10 @@ import BottomNav from "./BottomNav";
 interface PageWrapperProps {
   children: React.ReactNode;
   showBackButton?: boolean;
+  contentClassName?: string;
 }
 
-const PageWrapper = ({ children }: PageWrapperProps) => {
+const PageWrapper = ({ children, contentClassName = "w-full max-w-7xl mx-auto" }: PageWrapperProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -21,7 +22,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
-        className="max-w-[480px] mx-auto"
+        className={contentClassName}
       >
         {children}
       </motion.main>

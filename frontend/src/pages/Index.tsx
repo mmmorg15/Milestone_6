@@ -25,57 +25,37 @@ const Index = () => {
   return (
     <PageWrapper>
       {/* Hero */}
-      <div className="relative h-64 overflow-hidden">
+      <div className="relative h-72 md:h-80 lg:h-[26rem] overflow-hidden rounded-b-3xl lg:rounded-3xl lg:mt-6">
         <img src={heroHome} alt="Peaceful sunset over mountains" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5 pb-6">
-          <motion.h1 {...fadeUp} transition={{ delay: 0.1 }} className="text-2xl font-bold text-foreground leading-tight">
+        <div className="absolute bottom-0 left-0 right-0 p-5 pb-6 md:p-8 lg:p-10">
+          <motion.h1 {...fadeUp} transition={{ delay: 0.1 }} className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight max-w-2xl">
             Hope begins with connection
           </motion.h1>
-          <motion.p {...fadeUp} transition={{ delay: 0.2 }} className="text-sm text-muted-foreground mt-1">
+          <motion.p {...fadeUp} transition={{ delay: 0.2 }} className="text-sm md:text-base text-muted-foreground mt-2 max-w-xl">
             You deserve support, and it starts right here.
           </motion.p>
         </div>
       </div>
 
-      <div className="px-5 pb-32 space-y-6">
-        {/* What happens */}
-        <motion.section {...fadeUp} transition={{ delay: 0.25 }} className="pt-4">
-          <h2 className="text-base font-semibold text-foreground mb-2">What happens if I reach out?</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+      <div className="px-5 md:px-8 lg:px-10 pb-32 pt-6 lg:pt-8 space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-6">
+        {/* Intro content */}
+        <motion.section {...fadeUp} transition={{ delay: 0.25 }} className="lg:col-span-7 xl:col-span-8 space-y-6">
+          <div>
+            <h2 className="text-base md:text-lg font-semibold text-foreground mb-2">What happens if I reach out?</h2>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
             This is a safe space to explore your feelings, find resources, and connect with support. 
             Everything here is designed to meet you where you are — no pressure, no judgment. 
             Take your time.
-          </p>
-        </motion.section>
-
-        {/* Crisis resources */}
-        <motion.section {...fadeUp} transition={{ delay: 0.3 }}>
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {crisisButtons.map((btn) => (
-              <a
-                key={btn.label}
-                href={btn.href}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-pill text-xs font-medium whitespace-nowrap min-h-[44px] transition-colors ${btn.color} hover:opacity-80`}
-              >
-                <btn.icon className="h-3.5 w-3.5" />
-                {btn.label}
-              </a>
-            ))}
-          </div>
-        </motion.section>
-
-        {/* Empathetic banner */}
-        <motion.section {...fadeUp} transition={{ delay: 0.35 }}>
-          <div className="bg-primary/8 border border-primary/15 rounded-xl p-5 text-center">
-            <p className="text-sm font-medium text-foreground">
-              You're not alone. People care about you. 💛
             </p>
           </div>
-        </motion.section>
 
-        {/* Quick access cards */}
-        <motion.section {...fadeUp} transition={{ delay: 0.4 }} className="space-y-3">
+          {/* Empathetic banner */}
+          <div className="bg-primary/8 border border-primary/15 rounded-xl p-5 md:p-6 text-center md:text-left">
+            <p className="text-sm md:text-base font-medium text-foreground">You're not alone. People care about you. 💛</p>
+          </div>
+
+          {/* Quick access cards */}
           {quickCards.map((card) => (
             <Link
               key={card.title}
@@ -93,17 +73,37 @@ const Index = () => {
           ))}
         </motion.section>
 
-        {/* Footer */}
-        <footer className="pt-4 border-t border-border text-center space-y-2">
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            This platform is for informational purposes only and does not provide medical advice, diagnosis, or treatment.
-          </p>
-          <div className="flex justify-center gap-4 text-xs text-muted-foreground">
-            <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-            <a href="#" className="hover:text-primary transition-colors">Terms</a>
-            <a href="#" className="hover:text-primary transition-colors">Contact</a>
+        {/* Crisis resources + footer */}
+        <motion.aside {...fadeUp} transition={{ delay: 0.3 }} className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 self-start">
+          <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-4 md:p-5 space-y-5">
+            <div>
+              <h3 className="text-sm md:text-base font-semibold text-foreground mb-3">Immediate options</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+                {crisisButtons.map((btn) => (
+                  <a
+                    key={btn.label}
+                    href={btn.href}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-pill text-xs md:text-sm font-medium min-h-[44px] transition-colors ${btn.color} hover:opacity-80`}
+                  >
+                    <btn.icon className="h-4 w-4" />
+                    {btn.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <footer className="pt-4 border-t border-border text-center lg:text-left space-y-2">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                This platform is for informational purposes only and does not provide medical advice, diagnosis, or treatment.
+              </p>
+              <div className="flex justify-center lg:justify-start gap-4 text-xs text-muted-foreground">
+                <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+                <a href="#" className="hover:text-primary transition-colors">Terms</a>
+                <a href="#" className="hover:text-primary transition-colors">Contact</a>
+              </div>
+            </footer>
           </div>
-        </footer>
+        </motion.aside>
       </div>
     </PageWrapper>
   );
