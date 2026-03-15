@@ -174,7 +174,8 @@ psql -U postgres -d milestone6 -c "SELECT je.id, u.email, je.content, je.created
 Build the frontend, copy it into `backend/public`, and create the deployment zip from inside `backend`:
 
 ```powershell
-Compress-Archive -Path server.js,db.js,package.json,package-lock.json,public -DestinationPath ../havenly-path-backend.zip -Force
+Remove-Item ..\havenly-path-backend.zip -Force -ErrorAction SilentlyContinue
+tar.exe -a -c -f ..\havenly-path-backend.zip server.js db.js package.json package-lock.json public
 ```
 
 Deploy `havenly-path-backend.zip` to Elastic Beanstalk. The Beanstalk root URL will serve the React app, and the same origin will handle `/api/...` requests.
