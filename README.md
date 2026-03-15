@@ -1,6 +1,6 @@
-﻿# Havenly Path
+﻿# Description
 
-Havenly Path is a mental-health support app that helps people check in on mood, journal safely, and access support resources for themselves or for loved ones. The project demonstrates a complete frontend + backend + PostgreSQL workflow with persistent data.
+This is a mental-health support app. Its goal is to provide resources for those that are supporting someone dealing with mental health challenges such as being suicidal as well as providing resources to support the struggling individual themself. It allows users them to check in on their mood, journal safely, and access support resources for themselves or for loved ones. The problem that it solves is mainly the lack of easy access to simple and helpful resources and plans that can make a real quick differences in the lives of supporters. The primary user would be someone who is supporting a struggling family member or friend. The project demonstrates a complete frontend + backend + PostgreSQL workflow with persistent data.
 
 ## Product Value
 - Gives users a low-friction place to log mood and journal entries.
@@ -8,7 +8,7 @@ Havenly Path is a mental-health support app that helps people check in on mood, 
 - Supports account-based persistence so saved entries belong to the logged-in user.
 
 ## Tech Stack (By Layer)
-- Frontend: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
+- Frontend: React, TypeScript, Vite, Tailwind CSS, shadcn ui
 - Backend API: Node.js, Express, dotenv, CORS
 - Database: PostgreSQL (SQL scripts for schema + seed)
 - Tooling: npm, nodemon, psql
@@ -34,6 +34,7 @@ flowchart LR
   C --- R
 ```
 
+
 ## Database Design
 The schema contains 5 tables:
 1. `users`
@@ -42,11 +43,12 @@ The schema contains 5 tables:
 4. `journal_entries`
 5. `support_resources`
 
-ERD alignment note: the original concept included `users`, `journal_entries`, and `mood_logs`; `moods` and `support_resources` were added to support lookup data/resources and meet the 5-table requirement.
 
 ## Prerequisites
-- Node.js 18+
-- PostgreSQL installed and running
+- Node.js 18+ Installation: https://nodejs.org/en/download
+    - Installation verification command: node -v
+- PostgreSQL installed and running. Installation: https://www.postgresql.org/download/
+    - Installation verification command: psql --version
 - `psql` CLI available in your terminal
 
 ## Environment Setup
@@ -57,7 +59,14 @@ Copy-Item backend\.env.example backend\.env
 Copy-Item frontend\.env.example frontend\.env
 ```
 
+Or in bash:
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
 `backend/.env` should point to your local DB credentials (default DB name used here is `milestone6`).
+(If the .env file in the backend doesn't have your correct DB_PASSWORD and other credentials, it won't work!)
 
 `backend/.env.example` includes `FRONTEND_URL=http://localhost:5173`, which is used only for local split-origin testing.
 
@@ -74,6 +83,7 @@ From repo root:
 
 ```powershell
 cd db
+psql -U postgres -c "CREATE DATABASE milestone6;"
 psql -U postgres -d milestone6 -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
 psql -U postgres -d milestone6 -f schema.sql
 psql -U postgres -d milestone6 -f seed.sql
@@ -85,13 +95,14 @@ Quick DB verification:
 psql -U postgres -d milestone6 -c "\dt"
 psql -U postgres -d milestone6 -c "SELECT COUNT(*) AS users_count FROM users;"
 psql -U postgres -d milestone6 -c "SELECT COUNT(*) AS moods_count FROM moods;"
+psql -U postgres -d milestone6 -c "SELECT * FROM users;"
 ```
 
 ## Run the App Locally
 Use two terminals for split-origin local development.
 
 Terminal 1 (Backend):
-
+Navigate to the project directory
 ```powershell
 cd backend
 npm install
@@ -99,12 +110,13 @@ npm run dev
 ```
 
 Terminal 2 (Frontend):
-
+Navigate to the project directory
 ```powershell
 cd frontend
 npm install
 npm run dev
 ```
+The frontend installation might take a while. If running dev errors out, try deleting the front-end node_modules and package-lock.json, clearing terminal cache, and re-running the install and run dev commands.
 
 Open the frontend URL shown by Vite at `http://localhost:5173`.
 
