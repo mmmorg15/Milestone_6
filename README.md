@@ -16,7 +16,7 @@ Havenly Path is a mental-health support app that helps people check in on mood, 
 ## Architecture
 ```mermaid
 flowchart LR
-  A[React Frontend\nfrontend] -->|HTTP /api| B[Express API\nbackend/server.js]
+  A[React Frontend Build\nfrontend/dist] -->|copied to public/| B[Express API + Static Host\nbackend/server.js]
   B --> C[(PostgreSQL\nmilestone6)]
 
   subgraph DB Tables
@@ -59,6 +59,16 @@ Copy-Item frontend\.env.example frontend\.env
 
 `backend/.env` should point to your local DB credentials (default DB name used here is `milestone6`).
 
+`backend/.env.example` includes `FRONTEND_URL=http://localhost:5173`, which is used only for local split-origin testing.
+
+`frontend/.env.example` points to the deployed AWS backend:
+
+```dotenv
+VITE_API_BASE_URL=http://is401team09.us-east-2.elasticbeanstalk.com
+```
+
+`VITE_API_BASE_URL` is required for frontend API calls in local development and production builds.
+
 ## Recreate Database (Exact Steps)
 From repo root:
 
@@ -78,7 +88,7 @@ psql -U postgres -d milestone6 -c "SELECT COUNT(*) AS moods_count FROM moods;"
 ```
 
 ## Run the App Locally
-Use two terminals.
+Use two terminals for split-origin local development.
 
 Terminal 1 (Backend):
 
@@ -96,7 +106,31 @@ npm install
 npm run dev
 ```
 
-Open the frontend URL shown by Vite (typically `http://localhost:5173`).
+Open the frontend URL shown by Vite at `http://localhost:5173`.
+
+## Build Frontend For Beanstalk
+From the repo root:
+
+```powershell
+cd frontend
+npm run build
+Remove-Item ..\backend\public -Recurse -Force -ErrorAction SilentlyContinue
+New-Item ..\backend\public -ItemType Directory | Out-Null
+Copy-Item dist\* ..\backend\public -Recurse -Force
+```
+
+`backend/public` is generated from `frontend/dist` for deployment. Do not edit it by hand.
+
+## Run The Integrated App Locally
+After generating `backend/public`, run the backend and open the backend URL instead of Vite:
+
+```powershell
+cd backend
+npm install
+npm run dev
+```
+
+Open `http://localhost:3001`. Frontend routes like `/auth` and `/for-me` are served by Express, and `/api/...` still goes to the same backend server.
 
 ## Vertical Slice Verification (Button -> API -> DB -> Persisted)
 This verifies the `Save Journal Entry` and `Save Mood Check-In` flow.
@@ -117,11 +151,21 @@ psql -U postgres -d milestone6 -c "SELECT je.id, u.email, je.content, je.created
 8. Refresh the page and rerun the SQL queries above; rows remain in DB (persistent after refresh).
 
 ## API Endpoints Used
+- `GET /`
 - `POST /api/auth/signup`
 - `POST /api/auth/login`
 - `POST /api/mood-logs`
 - `POST /api/journal-entries`
 - `GET /api/health`
+
+## Beanstalk Packaging And Deployment
+Build the frontend, copy it into `backend/public`, and create the deployment zip from inside `backend`:
+
+```powershell
+Compress-Archive -Path server.js,db.js,package.json,package-lock.json,public -DestinationPath ../havenly-path-backend.zip -Force
+```
+
+Deploy `havenly-path-backend.zip` to Elastic Beanstalk. The Beanstalk root URL will serve the React app, and the same origin will handle `/api/...` requests.
 
 ## Notes / Current Limitations
 - Authentication is sessionless and stored client-side for this milestone.
