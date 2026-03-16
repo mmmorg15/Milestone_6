@@ -1,8 +1,7 @@
-# Havenly Path
+# Description
 
-Havenly Path is a full-stack mental health support app for two audiences:
-- people who need immediate self-support
-- people supporting a loved one through a mental health struggle
+This is a mental-health support app. Its goal is to provide resources for those that are supporting someone dealing with mental health challenges such as being suicidal as well as providing resources to support the struggling individual themself. It allows users them to check in on their mood, journal safely, and access support resources for themselves or for loved ones. The problem that it solves is mainly the lack of easy access to simple and helpful resources and plans that can make a real quick differences in the lives of supporters. The primary user would be someone who is supporting a struggling family member or friend. The project demonstrates a complete frontend + backend + PostgreSQL workflow with persistent data.
+
 
 The current version combines a React frontend, an Express API, and a PostgreSQL database. Users can create an account, log mood check-ins, save journal entries, and browse guided support content from a mobile-friendly interface.
 
@@ -14,6 +13,23 @@ The current version combines a React frontend, an Express API, and a PostgreSQL 
 - Supporter guidance for caregiver self-care, communication, and risk assessment
 - Privacy, terms, and contact pages
 - Express static hosting for the built frontend in deployment mode
+
+## Ears Requirements
+
+### Ubiquitous requirements
+The system shall provide plain-language mental health education for non-experts.
+The system shall maintain user privacy by not storing personal mental health data
+### Event-Driven requirements 
+When a user indicates uncertainty about their friend’s condition, the system shall display warning signs and escalation guidance.
+When a user indicates persistent or worsening distress, the system shall display escalation guidance and professional help options.
+When a user requests professional support options, the system shall display external service links.
+When a user selects a support situation, the system shall recommend appropriate conversation prompts.
+When a user selects a crisis scenario, the system shall immediately display emergency resources.
+### State-Driven requirements 
+While the user is reviewing escalation guidance, the system shall clearly differentiate “support actions” from “professional treatment.”
+While the user is viewing situational guidance, the system shall present steps in short, actionable bullets.
+While the user is in a self-care/boundaries section, the system shall emphasize sustainable support behaviors and burnout prevention.
+
 
 ## Tech Stack
 - Frontend: React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, Framer Motion
@@ -27,6 +43,105 @@ backend/   Express server, database connection, production static hosting
 db/        PostgreSQL schema and seed scripts
 frontend/  React application, UI components, tests, and build output
 ```
+
+## Architecture
+```mermaid
+flowchart LR
+  USER[User] --> A[React Frontend\nfrontend]
+
+  A -->|HTTP /api| B[Express API\nbackend/server.js]
+  B --> C[(PostgreSQL\nmilestone6)]
+
+  subgraph DB Tables
+    U[users]
+    M[moods]
+    ML[mood_logs]
+    J[journal_entries]
+    R[support_resources]
+  end
+
+  C --- U
+  C --- M
+  C --- ML
+  C --- J
+  C --- R
+```
+
+
+## Database Design
+The schema contains 5 tables:
+1. `users`
+2. `moods`
+3. `mood_logs`
+4. `journal_entries`
+5. `support_resources`
+
+
+## Prerequisites
+- Node.js 18+ Installation: https://nodejs.org/en/download
+    - Installation verification command: node -v
+- PostgreSQL installed and running. Installation: https://www.postgresql.org/download/
+    - Installation verification command: psql --version
+- `psql` CLI available in your terminal
+
+## Environment Setup
+From repo root:
+
+```powershell
+Copy-Item backend\.env.example backend\.env
+Copy-Item frontend\.env.example frontend\.env
+```
+
+Or in bash:
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+`backend/.env` should point to your local DB credentials (default DB name used here is `milestone6`).
+(If the .env file in the backend doesn't have your correct DB_PASSWORD and other credentials, it won't work!)
+
+## Recreate Database (Exact Steps)
+From repo root:
+
+```powershell
+cd db
+psql -U postgres -c "CREATE DATABASE milestone6;"
+psql -U postgres -d milestone6 -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+psql -U postgres -d milestone6 -f schema.sql
+psql -U postgres -d milestone6 -f seed.sql
+```
+
+Quick DB verification:
+
+```powershell
+psql -U postgres -d milestone6 -c "\dt"
+psql -U postgres -d milestone6 -c "SELECT COUNT(*) AS users_count FROM users;"
+psql -U postgres -d milestone6 -c "SELECT COUNT(*) AS moods_count FROM moods;"
+psql -U postgres -d milestone6 -c "SELECT * FROM users;"
+```
+
+## Run the App Locally
+Use two terminals.
+
+Terminal 1 (Backend):
+Navigate to the project directory
+```powershell
+cd backend
+npm install
+npm run dev
+```
+
+Terminal 2 (Frontend):
+Navigate to the project directory
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+The frontend installation might take a while. If running dev errors out, try deleting the front-end node_modules and package-lock.json, clearing terminal cache, and re-running the install and run dev commands.
+
+Open the frontend URL shown by Vite (typically `http://localhost:5173` or possibly port 8080).
 
 ## Frontend Routes
 - `/` - landing page and immediate support links
