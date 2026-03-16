@@ -7,7 +7,7 @@ import heroHome from "@/assets/hero-home.jpg";
 const crisisButtons = [
   { label: "988 Crisis Lifeline", icon: Phone, href: "tel:988", color: "bg-accent/15 text-accent" },
   { label: "Text Crisis Line", icon: MessageCircle, href: "sms:988", color: "bg-secondary/15 text-secondary" },
-  { label: "Find a Provider", icon: ExternalLink, href: "#", color: "bg-primary/15 text-primary" },
+  { label: "Find a Provider", icon: ExternalLink, href: "https://www.psychologytoday.com/us/therapists", color: "bg-primary/15 text-primary" },
 ];
 
 const quickCards = [
