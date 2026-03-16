@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { buildApiUrl } from "@/lib/api";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 const CURRENT_USER_KEY = "mindbridge-current-user";
 
 const Auth = () => {
@@ -44,7 +44,7 @@ const Auth = () => {
     setIsSigningUp(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+      const response = await fetch(buildApiUrl("/api/auth/signup"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -79,8 +79,8 @@ const Auth = () => {
       setEmailTips(false);
     } catch {
       toast({
-        title: "Server unavailable",
-        description: "Could not reach the backend server.",
+        title: "Request failed",
+        description: "Could not reach the backend server or the frontend API URL is missing.",
         variant: "destructive",
       });
     } finally {
@@ -103,7 +103,7 @@ const Auth = () => {
     setIsLoggingIn(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(buildApiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -133,8 +133,8 @@ const Auth = () => {
       });
     } catch {
       toast({
-        title: "Server unavailable",
-        description: "Could not reach the backend server.",
+        title: "Request failed",
+        description: "Could not reach the backend server or the frontend API URL is missing.",
         variant: "destructive",
       });
     } finally {

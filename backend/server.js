@@ -8,9 +8,15 @@ const pool = require("./db");
 
 const app = express();
 const port = Number(process.env.PORT || 3001);
+const publicDir = path.join(__dirname, "public");
 
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL || "*" }));
 app.use(express.json());
+app.use(express.static(publicDir));
+
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(publicDir, "index.html"));
+});
 
 async function findUserById(userId) {
   const userResult = await pool.query(
@@ -37,7 +43,11 @@ app.get("/api/health", async (_req, res) => {
     await pool.query("SELECT 1");
     res.json({ status: "ok", db: "connected" });
   } catch (error) {
-    res.status(500).json({ status: "error", message: "Database connection failed." });
+    console.error("DB health error:", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
   }
 });
 
@@ -169,6 +179,10 @@ app.post("/api/journal-entries", async (req, res) => {
   }
 });
 
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(publicDir, "index.html"));
+});
+
 app.listen(port, () => {
-  console.log(`Backend server running on http://localhost:${port}`);
+  console.log(`Backend server running on port ${port}`);
 });
