@@ -204,6 +204,12 @@ FRONTEND_URL=http://localhost:5173
 DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/milestone6
 ```
 
+`FRONTEND_URL` can also be a comma-separated list if you need to allow multiple frontend origins during development, or `*` if you want the API to accept requests from any origin:
+
+```dotenv
+FRONTEND_URL=http://localhost:5173,http://10.34.58.10:5173
+```
+
 `frontend/.env` should look like this for local development:
 
 ```dotenv

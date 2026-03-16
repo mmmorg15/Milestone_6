@@ -9,9 +9,31 @@ const pool = require("./db");
 const app = express();
 const port = Number(process.env.PORT || 3001);
 const publicDir = path.join(__dirname, "public");
+function normalizeOrigin(origin) {
+  return String(origin).trim().replace(/\/+$/, "").toLowerCase();
+}
 
-app.use(cors({ origin: process.env.FRONTEND_URL || "*" }));
+const allowedOrigins = (process.env.FRONTEND_URL || "*")
+  .split(",")
+  .map((origin) => normalizeOrigin(origin))
+  .filter(Boolean);
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes("*")) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = normalizeOrigin(origin);
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origin ${origin} is not allowed by CORS.`));
+  },
+};
+
 app.use(express.json());
+app.use("/api", cors(corsOptions));
 app.use(express.static(publicDir));
 
 app.get("/", (_req, res) => {
@@ -74,6 +96,7 @@ app.post("/api/auth/signup", async (req, res) => {
 
     return res.status(201).json({ user: result.rows[0] });
   } catch (error) {
+    console.error("Signup error:", error);
     return res.status(500).json({ message: "Failed to create account." });
   }
 });
@@ -99,6 +122,7 @@ app.post("/api/auth/login", async (req, res) => {
 
     return res.json({ user: result.rows[0] });
   } catch (error) {
+    console.error("Login error:", error);
     return res.status(500).json({ message: "Login request failed." });
   }
 });
@@ -179,8 +203,16 @@ app.post("/api/journal-entries", async (req, res) => {
   }
 });
 
-app.get("*", (_req, res) => {
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api/") || path.extname(req.path)) {
+    return next();
+  }
+
   res.sendFile(path.join(publicDir, "index.html"));
+});
+
+app.use((_req, res) => {
+  res.status(404).send("Not found");
 });
 
 app.listen(port, () => {
