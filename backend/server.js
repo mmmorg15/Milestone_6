@@ -9,27 +9,40 @@ const pool = require("./db");
 const app = express();
 const port = Number(process.env.PORT || 3001);
 const publicDir = path.join(__dirname, "public");
+
 function normalizeOrigin(origin) {
   return String(origin).trim().replace(/\/+$/, "").toLowerCase();
 }
 
-const allowedOrigins = (process.env.FRONTEND_URL || "*")
+const envOrigins = (process.env.FRONTEND_URL || "")
   .split(",")
   .map((origin) => normalizeOrigin(origin))
   .filter(Boolean);
+
+const defaultAllowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://is401team09.us-east-2.elasticbeanstalk.com",
+  "https://is401team09.us-east-2.elasticbeanstalk.com",
+];
+
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envOrigins])];
+
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes("*")) {
+    if (!origin) {
       return callback(null, true);
     }
 
     const normalizedOrigin = normalizeOrigin(origin);
+
     if (allowedOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
     }
 
     return callback(new Error(`Origin ${origin} is not allowed by CORS.`));
   },
+  credentials: true,
 };
 
 app.use(express.json());
