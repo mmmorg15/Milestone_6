@@ -97,9 +97,9 @@ const Index = () => {
                 This platform is for informational purposes only and does not provide medical advice, diagnosis, or treatment.
               </p>
               <div className="flex justify-center lg:justify-start gap-4 text-xs text-muted-foreground">
-                <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-                <a href="#" className="hover:text-primary transition-colors">Terms</a>
-                <a href="#" className="hover:text-primary transition-colors">Contact</a>
+                <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
+                <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
+                <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
               </div>
             </footer>
           </div>
