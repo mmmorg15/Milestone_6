@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ForMe from "./pages/ForMe";
+import JournalEntries from "./pages/JournalEntries";
 import Supporters from "./pages/Supporters";
 import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/for-me" element={<ForMe />} />
+          <Route path="/journal-entries" element={<JournalEntries />} />
           <Route path="/supporters" element={<Supporters />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />

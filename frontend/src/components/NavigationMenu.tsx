@@ -1,4 +1,4 @@
-﻿import { Home, User, Heart, HandHeart } from "lucide-react";
+﻿import { Home, User, Heart, HandHeart, BookOpenText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import navMosaic from "@/assets/nav-mosaic.jpg";
@@ -12,6 +12,7 @@ const navItems = [
   { icon: Home, label: "Home", description: "Start here", to: "/" },
   { icon: User, label: "Login / Sign Up", description: "Save your progress", to: "/auth" },
   { icon: Heart, label: "I Need Help", description: "Get personalized support", to: "/for-me" },
+  { icon: BookOpenText, label: "My Journal", description: "Edit saved entries", to: "/journal-entries" },
   { icon: HandHeart, label: "For Supporters", description: "Help a loved one", to: "/supporters" },
 ];
 

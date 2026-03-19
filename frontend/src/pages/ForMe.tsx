@@ -212,6 +212,7 @@ const ForMe = () => {
         return;
       }
 
+      saveJournalLocal("");
       toast({ title: "Journal saved", description: "Your entry was saved to your account." });
     } catch {
       toast({
@@ -350,9 +351,14 @@ const ForMe = () => {
               />
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs text-muted-foreground">Auto-saved locally (per account)</p>
-                <Button type="button" onClick={handleSaveJournalEntry} disabled={isSavingJournal} className="h-10 rounded-xl text-sm font-semibold">
-                  {isSavingJournal ? "Saving..." : "Save Journal Entry"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button asChild type="button" variant="outline" className="h-10 rounded-xl text-sm font-semibold">
+                    <Link to="/journal-entries">View Saved Entries</Link>
+                  </Button>
+                  <Button type="button" onClick={handleSaveJournalEntry} disabled={isSavingJournal} className="h-10 rounded-xl text-sm font-semibold">
+                    {isSavingJournal ? "Saving..." : "Save Journal Entry"}
+                  </Button>
+                </div>
               </div>
             </motion.div>
           )}
