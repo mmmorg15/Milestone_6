@@ -10,6 +10,7 @@ The current version combines a React frontend, an Express API, and a PostgreSQL 
 - Account sign up and log in flows
 - Mood check-ins saved to PostgreSQL
 - Therapeutic journaling with local autosave plus database persistence
+- The journaling allows for viewing past journal entries, editing them, and deleting them if desired
 - Supporter guidance for caregiver self-care, communication, and risk assessment
 - Privacy, terms, and contact pages
 - Express static hosting for the built frontend in deployment mode

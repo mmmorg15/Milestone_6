@@ -314,6 +314,45 @@ app.put("/api/journal-entries/:entryId", async (req, res) => {
   }
 });
 
+app.delete("/api/journal-entries/:entryId", async (req, res) => {
+  const parsedEntryId = Number(req.params.entryId);
+  const parsedUserId = Number(req.body?.userId);
+
+  if (!parsedEntryId || Number.isNaN(parsedEntryId)) {
+    return res.status(400).json({ message: "A valid entryId is required." });
+  }
+
+  if (!parsedUserId || Number.isNaN(parsedUserId)) {
+    return res.status(400).json({ message: "A valid userId is required." });
+  }
+
+  try {
+    const user = await findUserById(parsedUserId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const existingEntryResult = await pool.query(
+      "SELECT id, user_id FROM journal_entries WHERE id = $1",
+      [parsedEntryId]
+    );
+    const existingEntry = existingEntryResult.rows[0];
+
+    if (!existingEntry) {
+      return res.status(404).json({ message: "Journal entry not found." });
+    }
+
+    if (existingEntry.user_id !== parsedUserId) {
+      return res.status(403).json({ message: "You can only delete your own journal entries." });
+    }
+
+    await pool.query("DELETE FROM journal_entries WHERE id = $1", [parsedEntryId]);
+    return res.json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to delete journal entry." });
+  }
+});
+
 app.get("*", (req, res, next) => {
   if (req.path.startsWith("/api/") || path.extname(req.path)) {
     return next();
