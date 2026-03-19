@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/for-me" element={<ForMe />} />
           <Route path="/journal-entries" element={<JournalEntries />} />
           <Route path="/supporters" element={<Supporters />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/contact" element={<Contact />} />
