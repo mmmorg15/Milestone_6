@@ -73,7 +73,7 @@ const TopBar = ({ onMenuOpen }: TopBarProps) => {
         </Button>
 
         <span className="text-lg font-semibold tracking-wide text-foreground/80">
-          Quick Health Connection
+          Connection to hope
         </span>
 
         <Link

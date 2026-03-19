@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Pencil, Save } from "lucide-react";
+import { ArrowLeft, Pencil, Save, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageWrapper from "@/components/PageWrapper";
@@ -36,6 +36,7 @@ type EntryDraft = {
   createdAt: string;
   updatedAt: string;
   isSaving: boolean;
+  isDeleting: boolean;
   isEditing: boolean;
 };
 
@@ -127,6 +128,7 @@ const JournalEntries = () => {
           createdAt: entry.created_at,
           updatedAt: entry.updated_at,
           isSaving: false,
+          isDeleting: false,
           isEditing: false,
         }));
 
@@ -255,6 +257,45 @@ const JournalEntries = () => {
     );
   };
 
+  const handleDeleteEntry = async (entryId: number) => {
+    if (!currentUser) {
+      return;
+    }
+
+    const shouldDelete = window.confirm("Are you sure?");
+    if (!shouldDelete) {
+      return;
+    }
+
+    setEntries((prev) => prev.map((entry) => (entry.id === entryId ? { ...entry, isDeleting: true } : entry)));
+
+    try {
+      const response = await fetch(buildApiUrl(`/api/journal-entries/${entryId}`), {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser.id }),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as { message?: string };
+
+      if (!response.ok) {
+        toast({ title: "Could not delete entry", description: data.message || "Please try again.", variant: "destructive" });
+        setEntries((prev) => prev.map((entry) => (entry.id === entryId ? { ...entry, isDeleting: false } : entry)));
+        return;
+      }
+
+      setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+      toast({ title: "Entry deleted", description: "Your journal entry has been removed." });
+    } catch {
+      setEntries((prev) => prev.map((entry) => (entry.id === entryId ? { ...entry, isDeleting: false } : entry)));
+      toast({
+        title: "Request failed",
+        description: "Could not reach the backend server or the frontend API URL is missing.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleCancelEditing = (entryId: number) => {
     setEntries((prev) =>
       prev.map((entry) =>
@@ -349,8 +390,18 @@ const JournalEntries = () => {
                         <Button
                           type="button"
                           variant="outline"
+                          onClick={() => handleDeleteEntry(entry.id)}
+                          disabled={entry.isSaving || entry.isDeleting}
+                          className="h-10 rounded-xl text-sm font-semibold border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          {entry.isDeleting ? "Deleting..." : "Delete"}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
                           onClick={() => handleCancelEditing(entry.id)}
-                          disabled={entry.isSaving}
+                          disabled={entry.isSaving || entry.isDeleting}
                           className="h-10 rounded-xl text-sm font-semibold"
                         >
                           Cancel
@@ -358,7 +409,7 @@ const JournalEntries = () => {
                         <Button
                           type="button"
                           onClick={() => handleSaveEntry(entry.id)}
-                          disabled={entry.isSaving || !isDirty || !entry.draftContent.trim()}
+                          disabled={entry.isSaving || entry.isDeleting || !isDirty || !entry.draftContent.trim()}
                           className="h-10 rounded-xl text-sm font-semibold"
                         >
                           <Save className="h-4 w-4" />
@@ -372,11 +423,22 @@ const JournalEntries = () => {
                         <p className="text-sm text-foreground whitespace-pre-wrap break-words">{entry.originalContent}</p>
                       </div>
 
-                      <div className="flex items-center justify-end">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleDeleteEntry(entry.id)}
+                          disabled={entry.isDeleting}
+                          className="h-10 rounded-xl text-sm font-semibold border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          {entry.isDeleting ? "Deleting..." : "Delete"}
+                        </Button>
                         <Button
                           type="button"
                           variant="outline"
                           onClick={() => handleStartEditing(entry.id)}
+                          disabled={entry.isDeleting}
                           className="h-10 rounded-xl text-sm font-semibold"
                         >
                           <Pencil className="h-4 w-4" />
