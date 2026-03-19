@@ -1,7 +1,10 @@
-﻿import { Home, User, Heart, HandHeart, BookOpenText } from "lucide-react";
+﻿import { useEffect, useMemo, useState } from "react";
+import { Home, User, Heart, HandHeart, BookOpenText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import navMosaic from "@/assets/nav-mosaic.jpg";
+
+const CURRENT_USER_KEY = "mindbridge-current-user";
 
 interface NavigationMenuProps {
   open: boolean;
@@ -17,6 +20,40 @@ const navItems = [
 ];
 
 const NavigationMenu = ({ open, onOpenChange }: NavigationMenuProps) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const syncUser = () => {
+      const rawUser = localStorage.getItem(CURRENT_USER_KEY);
+      if (!rawUser) {
+        setIsLoggedIn(false);
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(rawUser) as { id?: number; email?: string };
+        setIsLoggedIn(Boolean(parsed?.id && parsed?.email));
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+
+    syncUser();
+
+    window.addEventListener("storage", syncUser);
+    window.addEventListener("current-user-changed", syncUser);
+
+    return () => {
+      window.removeEventListener("storage", syncUser);
+      window.removeEventListener("current-user-changed", syncUser);
+    };
+  }, []);
+
+  const visibleNavItems = useMemo(
+    () => navItems.filter((item) => !(isLoggedIn && item.to === "/auth")),
+    [isLoggedIn],
+  );
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-[300px] bg-background p-0 flex flex-col">
@@ -27,7 +64,7 @@ const NavigationMenu = ({ open, onOpenChange }: NavigationMenuProps) => {
         <nav className="flex-1 p-3">
           <p className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">Quick Access</p>
           <ul className="space-y-1">
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <li key={item.to}>
                 <Link
                   to={item.to}

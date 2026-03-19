@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageWrapper from "@/components/PageWrapper";
 import { Button } from "@/components/ui/button";
@@ -12,13 +12,33 @@ import { buildApiUrl } from "@/lib/api";
 
 const CURRENT_USER_KEY = "mindbridge-current-user";
 
+const isAuthenticatedUser = (value: string | null) => {
+  if (!value) {
+    return false;
+  }
+
+  try {
+    const parsed = JSON.parse(value) as { id?: number; email?: string };
+    return Boolean(parsed?.id && parsed?.email);
+  } catch {
+    return false;
+  }
+};
+
 const Auth = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [signupForm, setSignupForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [emailTips, setEmailTips] = useState(false);
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticatedUser(localStorage.getItem(CURRENT_USER_KEY))) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +97,7 @@ const Auth = () => {
       setLoginForm({ email: signupForm.email.trim(), password: signupForm.password });
       setSignupForm({ name: "", email: "", password: "", confirm: "" });
       setEmailTips(false);
+      navigate("/");
     } catch {
       toast({
         title: "Request failed",
@@ -131,6 +152,7 @@ const Auth = () => {
         title: "Welcome back",
         description: `Good to see you again, ${displayName}.`,
       });
+      navigate("/");
     } catch {
       toast({
         title: "Request failed",
