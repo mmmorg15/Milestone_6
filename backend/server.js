@@ -216,6 +216,104 @@ app.post("/api/journal-entries", async (req, res) => {
   }
 });
 
+app.get("/api/journal-entries", async (req, res) => {
+  const parsedUserId = Number(req.query.userId);
+
+  if (!parsedUserId || Number.isNaN(parsedUserId)) {
+    return res.status(400).json({ message: "A valid userId query parameter is required." });
+  }
+
+  try {
+    const user = await findUserById(parsedUserId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const query = `
+      SELECT
+        je.id,
+        je.user_id,
+        je.mood_id,
+        m.code AS mood_code,
+        m.label AS mood_label,
+        je.content,
+        je.created_at,
+        je.updated_at
+      FROM journal_entries je
+      LEFT JOIN moods m ON je.mood_id = m.id
+      WHERE je.user_id = $1
+      ORDER BY je.created_at DESC
+    `;
+
+    const result = await pool.query(query, [parsedUserId]);
+    return res.json({ journalEntries: result.rows });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to load journal entries." });
+  }
+});
+
+app.put("/api/journal-entries/:entryId", async (req, res) => {
+  const parsedEntryId = Number(req.params.entryId);
+  const parsedUserId = Number(req.body.userId);
+  const { content, moodCode = null } = req.body;
+
+  if (!parsedEntryId || Number.isNaN(parsedEntryId)) {
+    return res.status(400).json({ message: "A valid entryId is required." });
+  }
+
+  if (!parsedUserId || Number.isNaN(parsedUserId)) {
+    return res.status(400).json({ message: "A valid userId is required." });
+  }
+
+  const trimmedContent = typeof content === "string" ? content.trim() : "";
+  if (!trimmedContent) {
+    return res.status(400).json({ message: "Journal content is required." });
+  }
+
+  try {
+    const user = await findUserById(parsedUserId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const existingEntryResult = await pool.query(
+      "SELECT id, user_id FROM journal_entries WHERE id = $1",
+      [parsedEntryId]
+    );
+    const existingEntry = existingEntryResult.rows[0];
+
+    if (!existingEntry) {
+      return res.status(404).json({ message: "Journal entry not found." });
+    }
+
+    if (existingEntry.user_id !== parsedUserId) {
+      return res.status(403).json({ message: "You can only edit your own journal entries." });
+    }
+
+    let moodId = null;
+    if (moodCode) {
+      moodId = await findMoodIdByCode(moodCode);
+      if (!moodId) {
+        return res.status(400).json({ message: "Invalid moodCode." });
+      }
+    }
+
+    const updateQuery = `
+      UPDATE journal_entries
+      SET content = $1,
+          mood_id = $2,
+          updated_at = NOW()
+      WHERE id = $3
+      RETURNING id, user_id, mood_id, content, created_at, updated_at
+    `;
+
+    const updatedResult = await pool.query(updateQuery, [trimmedContent, moodId, parsedEntryId]);
+    return res.json({ journalEntry: updatedResult.rows[0] });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update journal entry." });
+  }
+});
+
 app.get("*", (req, res, next) => {
   if (req.path.startsWith("/api/") || path.extname(req.path)) {
     return next();
