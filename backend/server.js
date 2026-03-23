@@ -74,6 +74,7 @@ app.post("/api/auth/signup", async (req, res) => {
 
     return res.status(201).json({ user: result.rows[0] });
   } catch (error) {
+    console.error("Signup error:", error.message);
     return res.status(500).json({ message: "Failed to create account." });
   }
 });
@@ -136,6 +137,30 @@ app.post("/api/mood-logs", async (req, res) => {
     return res.status(201).json({ moodLog: result.rows[0] });
   } catch (error) {
     return res.status(500).json({ message: "Failed to save mood log." });
+  }
+});
+
+// Mood Logs endpoint with JOIN to include mood code and ordered by logged_at descending, limited to 20 entries
+app.get("/api/mood-logs/:userId", async (req, res) => {
+  const parsedUserId = Number(req.params.userId);
+
+  if (!parsedUserId || Number.isNaN(parsedUserId)) {
+    return res.status(400).json({ message: "A valid userId is required." });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT ml.id, ml.notes, ml.logged_at, m.code AS mood_code
+       FROM mood_logs ml
+       JOIN moods m ON ml.mood_id = m.id
+       WHERE ml.user_id = $1
+       ORDER BY ml.logged_at DESC
+       LIMIT 20`,
+      [parsedUserId]
+    );
+    return res.json({ moodLogs: result.rows });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch mood logs." });
   }
 });
 
