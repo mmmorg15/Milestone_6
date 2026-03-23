@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArrowLeft, User } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageWrapper from "@/components/PageWrapper";
 import { Button } from "@/components/ui/button";
@@ -8,37 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { buildApiUrl } from "@/lib/api";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 const CURRENT_USER_KEY = "mindbridge-current-user";
-
-const isAuthenticatedUser = (value: string | null) => {
-  if (!value) {
-    return false;
-  }
-
-  try {
-    const parsed = JSON.parse(value) as { id?: number; email?: string };
-    return Boolean(parsed?.id && parsed?.email);
-  } catch {
-    return false;
-  }
-};
 
 const Auth = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [signupForm, setSignupForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [emailTips, setEmailTips] = useState(false);
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticatedUser(localStorage.getItem(CURRENT_USER_KEY))) {
-      navigate("/", { replace: true });
-    }
-  }, [navigate]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +44,7 @@ const Auth = () => {
     setIsSigningUp(true);
 
     try {
-      const response = await fetch(buildApiUrl("/api/auth/signup"), {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -97,11 +77,10 @@ const Auth = () => {
       setLoginForm({ email: signupForm.email.trim(), password: signupForm.password });
       setSignupForm({ name: "", email: "", password: "", confirm: "" });
       setEmailTips(false);
-      navigate("/");
     } catch {
       toast({
-        title: "Request failed",
-        description: "Could not reach the backend server or the frontend API URL is missing.",
+        title: "Server unavailable",
+        description: "Could not reach the backend server.",
         variant: "destructive",
       });
     } finally {
@@ -124,7 +103,7 @@ const Auth = () => {
     setIsLoggingIn(true);
 
     try {
-      const response = await fetch(buildApiUrl("/api/auth/login"), {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -152,11 +131,10 @@ const Auth = () => {
         title: "Welcome back",
         description: `Good to see you again, ${displayName}.`,
       });
-      navigate("/");
     } catch {
       toast({
-        title: "Request failed",
-        description: "Could not reach the backend server or the frontend API URL is missing.",
+        title: "Server unavailable",
+        description: "Could not reach the backend server.",
         variant: "destructive",
       });
     } finally {
@@ -232,6 +210,17 @@ const Auth = () => {
                   onChange={(e) => setSignupForm({ ...signupForm, confirm: e.target.value })}
                   className="h-11 rounded-xl border-border"
                 />
+              </div>
+              <div className="flex items-center gap-2 py-1">
+                <Checkbox
+                  id="tips"
+                  checked={emailTips}
+                  onCheckedChange={(v) => setEmailTips(v === true)}
+                  className="rounded"
+                />
+                <label htmlFor="tips" className="text-xs text-muted-foreground cursor-pointer">
+                  Send me supportive tips via email
+                </label>
               </div>
               <Button type="submit" className="w-full h-12 rounded-xl text-sm font-semibold" disabled={isSigningUp}>
                 {isSigningUp ? "Creating account..." : "Create Account"}

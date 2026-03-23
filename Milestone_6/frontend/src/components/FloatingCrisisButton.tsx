@@ -40,7 +40,7 @@ const FloatingCrisisButton = () => {
                   <p className="text-xs text-muted-foreground">Text-based support</p>
                 </div>
               </a>
-              <a href="https://www.psychologytoday.com/us/therapists" className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors min-h-[44px]">
+              <a href="#" className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors min-h-[44px]">
                 <ExternalLink className="h-4 w-4 text-primary" />
                 <div>
                   <p className="text-sm font-medium text-foreground">More Resources</p>

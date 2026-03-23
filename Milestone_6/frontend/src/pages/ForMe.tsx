@@ -6,9 +6,9 @@ import PageWrapper from "@/components/PageWrapper";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { buildApiUrl } from "@/lib/api";
 import heroForMe from "@/assets/hero-forme.jpg";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 const CURRENT_USER_KEY = "mindbridge-current-user";
 const JOURNAL_KEY_PREFIX = "mindbridge-journal";
 
@@ -152,7 +152,7 @@ const ForMe = () => {
     setIsSavingMood(true);
 
     try {
-      const response = await fetch(buildApiUrl("/api/mood-logs"), {
+      const response = await fetch(`${API_BASE_URL}/api/mood-logs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -171,11 +171,7 @@ const ForMe = () => {
 
       toast({ title: "Mood saved", description: "Your check-in was saved to your account." });
     } catch {
-      toast({
-        title: "Request failed",
-        description: "Could not reach the backend server or the frontend API URL is missing.",
-        variant: "destructive",
-      });
+      toast({ title: "Server unavailable", description: "Could not reach the backend server.", variant: "destructive" });
     } finally {
       setIsSavingMood(false);
     }
@@ -195,7 +191,7 @@ const ForMe = () => {
     setIsSavingJournal(true);
 
     try {
-      const response = await fetch(buildApiUrl("/api/journal-entries"), {
+      const response = await fetch(`${API_BASE_URL}/api/journal-entries`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -212,14 +208,9 @@ const ForMe = () => {
         return;
       }
 
-      saveJournalLocal("");
       toast({ title: "Journal saved", description: "Your entry was saved to your account." });
     } catch {
-      toast({
-        title: "Request failed",
-        description: "Could not reach the backend server or the frontend API URL is missing.",
-        variant: "destructive",
-      });
+      toast({ title: "Server unavailable", description: "Could not reach the backend server.", variant: "destructive" });
     } finally {
       setIsSavingJournal(false);
     }
@@ -280,7 +271,7 @@ const ForMe = () => {
           )}
         </motion.section>
 
-        <a href="https://www.psychologytoday.com/us/therapists" className="flex items-center justify-between p-4 bg-accent/10 rounded-xl border border-accent/20 hover:bg-accent/15 transition-colors min-h-[44px]">
+        <a href="#" className="flex items-center justify-between p-4 bg-accent/10 rounded-xl border border-accent/20 hover:bg-accent/15 transition-colors min-h-[44px]">
           <span className="text-sm font-semibold text-foreground">Speak with a Counselor</span>
           <ArrowRight className="h-4 w-4 text-accent" />
         </a>
@@ -351,14 +342,9 @@ const ForMe = () => {
               />
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs text-muted-foreground">Auto-saved locally (per account)</p>
-                <div className="flex items-center gap-2">
-                  <Button asChild type="button" variant="outline" className="h-10 rounded-xl text-sm font-semibold">
-                    <Link to="/journal-entries">View Saved Entries</Link>
-                  </Button>
-                  <Button type="button" onClick={handleSaveJournalEntry} disabled={isSavingJournal} className="h-10 rounded-xl text-sm font-semibold">
-                    {isSavingJournal ? "Saving..." : "Save Journal Entry"}
-                  </Button>
-                </div>
+                <Button type="button" onClick={handleSaveJournalEntry} disabled={isSavingJournal} className="h-10 rounded-xl text-sm font-semibold">
+                  {isSavingJournal ? "Saving..." : "Save Journal Entry"}
+                </Button>
               </div>
             </motion.div>
           )}
