@@ -19,28 +19,28 @@ The current version combines a React frontend, an Express API, and a PostgreSQL 
 
 ### Ubiquitous requirements
 
-- The system shall provide plain-language mental health education for non-experts.
+- The system shall provide plain-language mental health education for non-experts. - Achieved
 
-- The system shall maintain user privacy by not storing personal mental health data
+- The system shall maintain user privacy by not storing personal mental health data. - Achieved
 ### Event-Driven requirements 
 
-- When a user indicates uncertainty about their friend’s condition, the system shall display warning signs and escalation guidance.
+- When a user indicates uncertainty about their friend’s condition, the system shall display warning signs and escalation guidance. - Achieved
 
-- When a user indicates persistent or worsening distress, the system shall display escalation guidance and professional help options.
+- When a user indicates persistent or worsening distress, the system shall display escalation guidance and professional help options. - Achieved
 
-- When a user requests professional support options, the system shall display external service links.
+- When a user requests professional support options, the system shall display external service links. - Achieved
 
-- When a user selects a support situation, the system shall recommend appropriate conversation prompts.
+- When a user selects a support situation, the system shall recommend appropriate conversation prompts. - Achieved
 
-- When a user selects a crisis scenario, the system shall immediately display emergency resources.
+- When a user selects a crisis scenario, the system shall immediately display emergency resources. - Achieved
 
 ### State-Driven requirements 
 
-- While the user is reviewing escalation guidance, the system shall clearly differentiate “support actions” from “professional treatment.”
+- While the user is reviewing escalation guidance, the system shall clearly differentiate “support actions” from “professional treatment.” - Achieved
 
-- While the user is viewing situational guidance, the system shall present steps in short, actionable bullets.
+- While the user is viewing situational guidance, the system shall present steps in short, actionable bullets. - Achieved
 
-- While the user is in a self-care/boundaries section, the system shall emphasize sustainable support behaviors and burnout prevention.
+- While the user is in a self-care/boundaries section, the system shall emphasize sustainable support behaviors and burnout prevention. - Achieved
 
 
 ## Tech Stack
