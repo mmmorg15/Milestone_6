@@ -235,6 +235,7 @@ const ForMe = () => {
         return;
       }
 
+      saveJournalLocal("");
       toast({ title: "Journal saved", description: "Your entry was saved to your account." });
     } catch {
       toast({
@@ -302,7 +303,7 @@ const ForMe = () => {
           )}
         </motion.section>
 
-        <a href="#" className="flex items-center justify-between p-4 bg-accent/10 rounded-xl border border-accent/20 hover:bg-accent/15 transition-colors min-h-[44px]">
+        <a href="https://www.psychologytoday.com/us/therapists" className="flex items-center justify-between p-4 bg-accent/10 rounded-xl border border-accent/20 hover:bg-accent/15 transition-colors min-h-[44px]">
           <span className="text-sm font-semibold text-foreground">Speak with a Counselor</span>
           <ArrowRight className="h-4 w-4 text-accent" />
         </a>
@@ -373,9 +374,14 @@ const ForMe = () => {
               />
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs text-muted-foreground">Auto-saved locally (per account)</p>
-                <Button type="button" onClick={handleSaveJournalEntry} disabled={isSavingJournal} className="h-10 rounded-xl text-sm font-semibold">
-                  {isSavingJournal ? "Saving..." : "Save Journal Entry"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button asChild type="button" variant="outline" className="h-10 rounded-xl text-sm font-semibold">
+                    <Link to="/journal-entries">View Saved Entries</Link>
+                  </Button>
+                  <Button type="button" onClick={handleSaveJournalEntry} disabled={isSavingJournal} className="h-10 rounded-xl text-sm font-semibold">
+                    {isSavingJournal ? "Saving..." : "Save Journal Entry"}
+                  </Button>
+                </div>
               </div>
             </motion.div>
           )}

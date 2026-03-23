@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const CURRENT_USER_KEY = "mindbridge-current-user";
@@ -25,10 +25,7 @@ interface TopBarProps {
 }
 
 const TopBar = ({ onMenuOpen }: TopBarProps) => {
-  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const accountMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const syncUser = () => {
@@ -62,28 +59,6 @@ const TopBar = ({ onMenuOpen }: TopBarProps) => {
     };
   }, []);
 
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (!accountMenuRef.current) {
-        return;
-      }
-
-      if (!accountMenuRef.current.contains(event.target as Node)) {
-        setAccountMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem(CURRENT_USER_KEY);
-    window.dispatchEvent(new Event("current-user-changed"));
-    setAccountMenuOpen(false);
-    navigate("/auth");
-  };
-
   return (
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-5 lg:px-10 py-3">
@@ -97,49 +72,21 @@ const TopBar = ({ onMenuOpen }: TopBarProps) => {
           <Menu className="h-5 w-5" />
         </Button>
 
-        <span className="text-sm font-semibold tracking-wide text-foreground/80">
-          MindBridge
+        <span className="text-lg font-semibold tracking-wide text-foreground/80">
+          Connection to hope
         </span>
 
-        {currentUser ? (
-          <div className="relative" ref={accountMenuRef}>
-            <button
-              type="button"
-              onClick={() => setAccountMenuOpen((prev) => !prev)}
-              className="h-11 min-w-[44px] max-w-[150px] px-3 rounded-xl border border-border bg-card text-xs font-medium text-foreground flex items-center justify-center truncate"
-              aria-label={`Account menu for ${getUserLabel(currentUser)}`}
-            >
-              {getUserLabel(currentUser)}
-            </button>
-            {accountMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card shadow-md p-2 space-y-1">
-                <p className="px-2 py-1 text-[11px] text-muted-foreground truncate">{currentUser.email}</p>
-                <Link
-                  to="/auth"
-                  onClick={() => setAccountMenuOpen(false)}
-                  className="block px-2 py-2 text-xs rounded-md hover:bg-muted transition-colors"
-                >
-                  Account
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="w-full text-left px-2 py-2 text-xs rounded-md hover:bg-muted transition-colors"
-                >
-                  Log out
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <Link
-            to="/auth"
-            aria-label="Go to login"
-            className="h-11 min-w-[44px] max-w-[150px] px-3 rounded-xl border border-border bg-card text-xs font-medium text-foreground flex items-center justify-center truncate"
-          >
-            Log In
-          </Link>
-        )}
+        <Link
+          to={currentUser ? "/profile" : "/auth"}
+          aria-label={
+            currentUser
+              ? `Go to account for ${getUserLabel(currentUser)}`
+              : "Go to login"
+          }
+          className="h-11 min-w-[44px] max-w-[150px] px-3 rounded-xl border border-border bg-card text-xs font-medium text-foreground flex items-center justify-center truncate"
+        >
+          {currentUser ? "Account" : "Log in/Sign up"}
+        </Link>
       </div>
     </header>
   );

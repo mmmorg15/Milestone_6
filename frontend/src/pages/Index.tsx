@@ -7,7 +7,7 @@ import heroHome from "@/assets/hero-home.jpg";
 const crisisButtons = [
   { label: "988 Crisis Lifeline", icon: Phone, href: "tel:988", color: "bg-accent/15 text-accent" },
   { label: "Text Crisis Line", icon: MessageCircle, href: "sms:988", color: "bg-secondary/15 text-secondary" },
-  { label: "Find a Provider", icon: ExternalLink, href: "#", color: "bg-primary/15 text-primary" },
+  { label: "Find a Provider", icon: ExternalLink, href: "https://www.psychologytoday.com/us/therapists", color: "bg-primary/15 text-primary" },
 ];
 
 const quickCards = [
@@ -44,9 +44,7 @@ const Index = () => {
           <div>
             <h2 className="text-base md:text-lg font-semibold text-foreground mb-2">What happens if I reach out?</h2>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-            This is a safe space to explore your feelings, find resources, and connect with support. 
-            Everything here is designed to meet you where you are — no pressure, no judgment. 
-            Take your time.
+            This is a supportive space where you can check in with yourself, explore what you’re feeling, and find help when you need it. Whether you’re overwhelmed, struggling, or just not sure where to start, these resources are here to meet you with care, clarity, and no judgment.
             </p>
           </div>
 
