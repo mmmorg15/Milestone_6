@@ -21,4 +21,16 @@ describe("api config", () => {
   it("throws a clear error when the env value is missing", () => {
     expect(() => getApiBaseUrl("")).toThrow(missingApiUrlMessage);
   });
+
+  it("uses the deployed origin when a production site was built with localhost", () => {
+    expect(
+      getApiBaseUrl("http://localhost:3001", "https://is401team09.us-east-2.elasticbeanstalk.com")
+    ).toBe("https://is401team09.us-east-2.elasticbeanstalk.com");
+  });
+
+  it("falls back to the deployed origin when the env value is missing in production", () => {
+    expect(getApiBaseUrl("", "https://is401team09.us-east-2.elasticbeanstalk.com")).toBe(
+      "https://is401team09.us-east-2.elasticbeanstalk.com"
+    );
+  });
 });

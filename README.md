@@ -203,6 +203,7 @@ Copy-Item frontend\.env.example frontend\.env
 PORT=3001
 FRONTEND_URL=http://localhost:5173
 DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/milestone6
+DATABASE_SSL=false
 ```
 
 `FRONTEND_URL` can also be a comma-separated list if you need to allow multiple frontend origins during development, or `*` if you want the API to accept requests from any origin:
@@ -219,6 +220,17 @@ VITE_API_BASE_URL=http://localhost:3001
 
 For deployment, set `VITE_API_BASE_URL` to the deployed backend origin before building the frontend.
 
+When you deploy the backend to Elastic Beanstalk with AWS RDS PostgreSQL, set these environment variables in Beanstalk:
+
+```dotenv
+PORT=3001
+FRONTEND_URL=http://is401team09.us-east-2.elasticbeanstalk.com,https://is401team09.us-east-2.elasticbeanstalk.com
+DATABASE_URL=postgresql://USERNAME:PASSWORD@YOUR_RDS_HOST:5432/YOUR_DB_NAME
+DATABASE_SSL=true
+```
+
+If `/api/health` returns an error similar to `no pg_hba.conf entry ... no encryption`, the RDS instance is rejecting non-SSL connections and `DATABASE_SSL=true` is required.
+
 ## Database Setup
 From the repo root:
 
@@ -226,6 +238,13 @@ From the repo root:
 psql -U postgres -d postgres -c "CREATE DATABASE milestone6;"
 psql -U postgres -d milestone6 -f db\schema.sql
 psql -U postgres -d milestone6 -f db\seed.sql
+```
+
+If your deployed `DATABASE_URL` points at an RDS database such as `postgres`, run schema and seed against that same database with SSL required:
+
+```powershell
+psql "postgresql://USER:PASSWORD@HOST:5432/DBNAME?sslmode=require" -f db\schema.sql
+psql "postgresql://USER:PASSWORD@HOST:5432/DBNAME?sslmode=require" -f db\seed.sql
 ```
 
 Optional verification:
@@ -272,7 +291,9 @@ cd frontend
 npm run build
 Remove-Item ..\backend\public -Recurse -Force -ErrorAction SilentlyContinue
 New-Item ..\backend\public -ItemType Directory | Out-Null
-Copy-Item dist\* ..\backend\public -Recurse -Force
+New-Item ..\backend\public\assets -ItemType Directory | Out-Null
+Get-ChildItem dist -File | Copy-Item -Destination ..\backend\public -Force
+Copy-Item dist\assets\* ..\backend\public\assets -Recurse -Force
 ```
 
 Then run the backend:
