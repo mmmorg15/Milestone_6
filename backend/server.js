@@ -176,6 +176,30 @@ app.post("/api/mood-logs", async (req, res) => {
   }
 });
 
+// Mood Logs endpoint with JOIN to include mood code and ordered by logged_at descending, limited to 20 entries
+app.get("/api/mood-logs/:userId", async (req, res) => {
+  const parsedUserId = Number(req.params.userId);
+
+  if (!parsedUserId || Number.isNaN(parsedUserId)) {
+    return res.status(400).json({ message: "A valid userId is required." });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT ml.id, ml.notes, ml.logged_at, m.code AS mood_code
+       FROM mood_logs ml
+       JOIN moods m ON ml.mood_id = m.id
+       WHERE ml.user_id = $1
+       ORDER BY ml.logged_at DESC
+       LIMIT 20`,
+      [parsedUserId]
+    );
+    return res.json({ moodLogs: result.rows });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch mood logs." });
+  }
+});
+
 app.post("/api/journal-entries", async (req, res) => {
   const { userId, content, moodCode = null } = req.body;
   const parsedUserId = Number(userId);

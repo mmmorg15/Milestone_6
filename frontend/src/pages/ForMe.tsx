@@ -79,6 +79,8 @@ const ForMe = () => {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [isSavingMood, setIsSavingMood] = useState(false);
   const [isSavingJournal, setIsSavingJournal] = useState(false);
+  const [moodHistory, setMoodHistory] = useState<{ id: number; mood_code: string; logged_at: string; notes: string | null }[]>([]);
+
 
   useEffect(() => {
     if (searchParams.get("mood") === "true") {
@@ -132,6 +134,26 @@ const ForMe = () => {
     [currentUser]
   );
 
+// Moodlog
+  const fetchMoodHistory = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      const response = await fetch(buildApiUrl(`/api/mood-logs/${currentUser.id}`));
+      const data = await response.json().catch(() => ({}));
+      if (response.ok) {
+        setMoodHistory(data.moodLogs || []);
+      }
+    } catch {
+      // silently fail
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    fetchMoodHistory();
+  }, [fetchMoodHistory]);
+
+
+
   const orderedResources = selectedMood
     ? moodResourceOrder[selectedMood].map((id) => resourceCards.find((r) => r.id === id)!).filter(Boolean)
     : resourceCards;
@@ -170,6 +192,7 @@ const ForMe = () => {
       }
 
       toast({ title: "Mood saved", description: "Your check-in was saved to your account." });
+      fetchMoodHistory();
     } catch {
       toast({
         title: "Request failed",
@@ -364,6 +387,35 @@ const ForMe = () => {
           )}
         </AnimatePresence>
       </div>
+          {currentUser && moodHistory.length > 0 && (
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="px-5 pb-6"
+      >
+        <h2 className="text-base font-semibold text-foreground mb-3">Your Mood History</h2>
+        <div className="space-y-2">
+          {moodHistory.map((log) => {
+            const moodData = moods.find((m) => m.id === log.mood_code);
+            const date = new Date(log.logged_at).toLocaleDateString(undefined, {
+              month: "short", day: "numeric", year: "numeric",
+            });
+            const time = new Date(log.logged_at).toLocaleTimeString(undefined, {
+              hour: "2-digit", minute: "2-digit",
+            });
+            return (
+              <div key={log.id} className="flex items-center gap-3 bg-card border border-border rounded-xl px-4 py-3">
+                <span className="text-xl">{moodData?.emoji ?? "🙂"}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{moodData?.label ?? log.mood_code}</p>
+                  <p className="text-xs text-muted-foreground">{date} at {time}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </motion.section>
+    )}
     </PageWrapper>
   );
 };
