@@ -85,7 +85,7 @@ const TopBar = ({ onMenuOpen }: TopBarProps) => {
           }
           className="h-11 min-w-[44px] max-w-[150px] px-3 rounded-xl border border-border bg-card text-xs font-medium text-foreground flex items-center justify-center truncate"
         >
-          {currentUser ? "Account" : "Log in/Sign up"}
+          {currentUser ? getUserLabel(currentUser) : "Log in/Sign up"}
         </Link>
       </div>
     </header>

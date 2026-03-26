@@ -4,6 +4,18 @@ import { Link, useLocation } from "react-router-dom";
 
 const CURRENT_USER_KEY = "mindbridge-current-user";
 
+type CurrentUser = {
+  id: number;
+  name: string | null;
+  email: string;
+};
+
+const getUserLabel = (user: CurrentUser) => {
+  const name = user.name?.trim();
+  if (name) return name;
+  return user.email.split("@")[0];
+};
+
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
   { icon: HeartPulse, label: "I Need Help", to: "/for-me" },
@@ -13,29 +25,23 @@ const navItems = [
 
 const BottomNav = () => {
   const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
   useEffect(() => {
     const syncUser = () => {
       const rawUser = localStorage.getItem(CURRENT_USER_KEY);
-      if (!rawUser) {
-        setIsLoggedIn(false);
-        return;
-      }
-
+      if (!rawUser) { setCurrentUser(null); return; }
       try {
-        const parsed = JSON.parse(rawUser) as { id?: number; email?: string };
-        setIsLoggedIn(Boolean(parsed?.id && parsed?.email));
+        const parsed = JSON.parse(rawUser) as CurrentUser;
+        setCurrentUser(parsed?.id && parsed?.email ? parsed : null);
       } catch {
-        setIsLoggedIn(false);
+        setCurrentUser(null);
       }
     };
 
     syncUser();
-
     window.addEventListener("storage", syncUser);
     window.addEventListener("current-user-changed", syncUser);
-
     return () => {
       window.removeEventListener("storage", syncUser);
       window.removeEventListener("current-user-changed", syncUser);
@@ -46,10 +52,14 @@ const BottomNav = () => {
     () =>
       navItems.map((item) =>
         item.label === "Account"
-          ? { ...item, to: isLoggedIn ? "/profile" : "/auth" }
+          ? {
+              ...item,
+              to: currentUser ? "/profile" : "/auth",
+              label: currentUser ? getUserLabel(currentUser) : "Account",
+            }
           : item,
       ),
-    [isLoggedIn],
+    [currentUser],
   );
 
   return (
@@ -59,17 +69,15 @@ const BottomNav = () => {
           const active = location.pathname === item.to;
           return (
             <Link
-              key={item.to}
+              key={item.label}
               to={item.to}
               className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors min-w-[64px] min-h-[44px] justify-center ${
-                active
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                active ? "text-primary" : "text-muted-foreground hover:text-foreground"
               }`}
               aria-label={item.label}
             >
               <item.icon className={`h-5 w-5 ${active ? "text-primary" : ""}`} />
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <span className="text-[10px] font-medium truncate max-w-[60px] text-center">{item.label}</span>
             </Link>
           );
         })}
