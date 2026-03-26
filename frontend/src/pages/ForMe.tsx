@@ -43,16 +43,7 @@ const resourceCards = [
   { id: "selfcare", icon: Leaf, title: "Wellness Practices", color: "text-secondary", bgColor: "bg-secondary/10" },
   { id: "coping", icon: Lightbulb, title: "Coping Techniques", color: "text-primary", bgColor: "bg-primary/10" },
   { id: "meditation", icon: Brain, title: "Guided Relaxation", color: "text-accent", bgColor: "bg-accent/10" },
-  { id: "journal", icon: BookOpen, title: "Therapeutic Journaling", color: "text-secondary", bgColor: "bg-secondary/10" },
 ];
-
-const moodResourceOrder: Record<string, string[]> = {
-  okay: ["selfcare", "meditation", "journal", "coping"],
-  sad: ["coping", "journal", "selfcare", "meditation"],
-  anxious: ["coping", "meditation", "selfcare", "journal"],
-  frustrated: ["coping", "selfcare", "journal", "meditation"],
-  numb: ["journal", "meditation", "coping", "selfcare"],
-};
 
 const selfCareTips = [
   "Take a 10-minute walk outside in fresh air",
@@ -154,9 +145,7 @@ const ForMe = () => {
 
 
 
-  const orderedResources = selectedMood
-    ? moodResourceOrder[selectedMood].map((id) => resourceCards.find((r) => r.id === id)!).filter(Boolean)
-    : resourceCards;
+const orderedResources = resourceCards;
 
   const selectedMoodData = moods.find((m) => m.id === selectedMood);
 
@@ -266,8 +255,8 @@ const ForMe = () => {
 
       <div className="px-5 pb-32 space-y-6">
         <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <h2 className="text-base font-semibold text-foreground mb-3">How are you feeling today?</h2>
-          <div className="flex flex-wrap gap-2">
+          <h2 className="text-base font-semibold text-foreground mb-3 text-center">How are you feeling today?</h2>
+          <div className="flex flex-wrap gap-2 justify-center">
             {moods.map((mood) => (
               <button
                 key={mood.id}
@@ -297,11 +286,36 @@ const ForMe = () => {
             )}
           </AnimatePresence>
           {selectedMood && (
-            <Button type="button" onClick={handleSaveMoodLog} disabled={isSavingMood} className="mt-3 h-11 rounded-xl text-sm font-semibold">
+              <div className="flex justify-center mt-3">
+              <Button type="button" onClick={handleSaveMoodLog} disabled={isSavingMood} className="h-11 rounded-xl text-sm font-semibold">
               {isSavingMood ? "Saving mood..." : "Save Mood Check-In"}
             </Button>
+            </div>
           )}
         </motion.section>
+
+          <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-card rounded-xl border border-border p-5 space-y-3">
+          <h3 className="text-sm font-semibold text-foreground">Therapeutic Journaling</h3>
+          <p className="text-xs text-muted-foreground">Write freely. The text auto-saves locally; use the button to save to your account.</p>
+          <Textarea
+            placeholder="What's on your mind today?"
+            value={journal}
+            onChange={(e) => saveJournalLocal(e.target.value)}
+            className="min-h-[120px] rounded-xl border-border text-sm resize-none"
+          />
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-muted-foreground">Auto-saved locally</p>
+            <div className="flex items-center gap-2">
+              <Button asChild type="button" variant="outline" className="h-10 rounded-xl text-sm font-semibold">
+                <Link to="/journal-entries">View Saved Entries</Link>
+              </Button>
+              <Button type="button" onClick={handleSaveJournalEntry} disabled={isSavingJournal} className="h-10 rounded-xl text-sm font-semibold">
+                {isSavingJournal ? "Saving..." : "Save Entry"}
+              </Button>
+            </div>
+          </div>
+        </motion.section>
+
 
         <a href="https://www.psychologytoday.com/us/therapists" className="flex items-center justify-between p-4 bg-accent/10 rounded-xl border border-accent/20 hover:bg-accent/15 transition-colors min-h-[44px]">
           <span className="text-sm font-semibold text-foreground">Speak with a Counselor</span>
@@ -362,60 +376,8 @@ const ForMe = () => {
               </p>
             </motion.div>
           )}
-          {expandedCard === "journal" && (
-            <motion.div key="journal" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="bg-card rounded-xl border border-border p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">Therapeutic Journaling</h3>
-              <p className="text-xs text-muted-foreground">Write freely. The text auto-saves locally for this account; use the button to save to your account in the database.</p>
-              <Textarea
-                placeholder="What's on your mind today?"
-                value={journal}
-                onChange={(e) => saveJournalLocal(e.target.value)}
-                className="min-h-[120px] rounded-xl border-border text-sm resize-none"
-              />
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs text-muted-foreground">Auto-saved locally (per account)</p>
-                <div className="flex items-center gap-2">
-                  <Button asChild type="button" variant="outline" className="h-10 rounded-xl text-sm font-semibold">
-                    <Link to="/journal-entries">View Saved Entries</Link>
-                  </Button>
-                  <Button type="button" onClick={handleSaveJournalEntry} disabled={isSavingJournal} className="h-10 rounded-xl text-sm font-semibold">
-                    {isSavingJournal ? "Saving..." : "Save Journal Entry"}
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
       </div>
-          {currentUser && moodHistory.length > 0 && (
-      <motion.section
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="px-5 pb-6"
-      >
-        <h2 className="text-base font-semibold text-foreground mb-3">Your Mood History</h2>
-        <div className="space-y-2">
-          {moodHistory.map((log) => {
-            const moodData = moods.find((m) => m.id === log.mood_code);
-            const date = new Date(log.logged_at).toLocaleDateString(undefined, {
-              month: "short", day: "numeric", year: "numeric",
-            });
-            const time = new Date(log.logged_at).toLocaleTimeString(undefined, {
-              hour: "2-digit", minute: "2-digit",
-            });
-            return (
-              <div key={log.id} className="flex items-center gap-3 bg-card border border-border rounded-xl px-4 py-3">
-                <span className="text-xl">{moodData?.emoji ?? "🙂"}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{moodData?.label ?? log.mood_code}</p>
-                  <p className="text-xs text-muted-foreground">{date} at {time}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </motion.section>
-    )}
     </PageWrapper>
   );
 };

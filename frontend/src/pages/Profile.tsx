@@ -36,7 +36,7 @@ const Profile = () => {
       <div className="min-h-[70vh] px-5 py-6 flex items-center justify-center">
         <div className="w-full max-w-xs flex flex-col gap-4">
           <Button asChild className="h-12 rounded-xl text-sm font-semibold">
-            <Link to="/journal-entries">View Journal Entries</Link>
+            <Link to="/journal-entries">View Journal & Mood History</Link>
           </Button>
           <Button
             type="button"

@@ -13,10 +13,10 @@ interface NavigationMenuProps {
 
 const navItems = [
   { icon: Home, label: "Home", description: "Start here", to: "/" },
-  { icon: User, label: "Login / Sign Up", description: "Save your progress", to: "/auth" },
   { icon: Heart, label: "I Need Help", description: "Get personalized support", to: "/for-me" },
-  { icon: BookOpenText, label: "My Journal", description: "Edit saved entries", to: "/journal-entries" },
   { icon: HandHeart, label: "For Supporters", description: "Help a loved one", to: "/supporters" },
+  { icon: BookOpenText, label: "My Account", description: "View your profile & entries", to: "/profile" },
+  { icon: User, label: "Login / Sign Up", description: "Save your progress", to: "/auth" },
 ];
 
 const NavigationMenu = ({ open, onOpenChange }: NavigationMenuProps) => {
@@ -49,8 +49,12 @@ const NavigationMenu = ({ open, onOpenChange }: NavigationMenuProps) => {
     };
   }, []);
 
-  const visibleNavItems = useMemo(
-    () => navItems.filter((item) => !(isLoggedIn && item.to === "/auth")),
+const visibleNavItems = useMemo(
+    () => navItems.filter((item) => {
+      if (item.to === "/auth") return !isLoggedIn;
+      if (item.to === "/profile") return isLoggedIn;
+      return true;
+    }),
     [isLoggedIn],
   );
 
