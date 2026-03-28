@@ -17,7 +17,7 @@ const Contact = () => {
             For project questions, technical issues, or feedback, please contact our team.
           </p>
           <p className="text-sm text-foreground">
-            <span className="font-medium">Email:</span> yourteamemail@example.com
+            <span className="font-medium">Email:</span> youngpet@byu.edu
           </p>
         </section>
 
