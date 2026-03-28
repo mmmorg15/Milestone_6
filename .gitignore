@@ -13,6 +13,8 @@ backend/public
 .env
 .env.example
 havenly-path-backend.zip
+havenly-path-deploy.zip
+node_modules
 
 
 # Logs

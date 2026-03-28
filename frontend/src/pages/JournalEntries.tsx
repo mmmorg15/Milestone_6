@@ -3,6 +3,7 @@ import { ArrowLeft, Pencil, Save, Search, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageWrapper from "@/components/PageWrapper";
+import OkrCard from "@/components/OkrCard";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -263,6 +264,8 @@ const JournalEntries = () => {
             {currentUser ? `Viewing entries for ${getUserLabel(currentUser)}.` : "Log in to view your saved entries."}
           </p>
         </div>
+
+        <OkrCard />
 
         {/* Tabs */}
         <div className="flex gap-2">
