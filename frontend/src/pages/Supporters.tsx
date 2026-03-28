@@ -211,14 +211,14 @@ const Supporters = () => {
                     <Phone className="h-4 w-4" /> Call 988 Now
                   </a>
                 )}
-                {i < urgencySteps.length - 1 && (
+                {/* {i < urgencySteps.length - 1 && (
                   <button
                     onClick={() => setUrgencyStep(i + 1)}
                     className="text-xs text-primary hover:underline"
                   >
                     No → Continue to next question
                   </button>
-                )}
+                )} */}
               </motion.div>
             ))}
           </TabsContent>

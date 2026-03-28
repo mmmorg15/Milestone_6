@@ -50,6 +50,12 @@ type MoodLog = {
   notes: string | null;
 };
 
+type MoodOption = {
+  id: string;
+  label: string;
+  emoji: string;
+};
+
 const moods = [
   { id: "okay", emoji: "😊", label: "Okay" },
   { id: "sad", emoji: "😔", label: "Sad" },
@@ -84,6 +90,8 @@ const JournalEntries = () => {
   const [moodPage, setMoodPage] = useState(1);
   const [journalSearch, setJournalSearch] = useState("");
   const [journalPageSize, setJournalPageSize] = useState(10);
+  const [selectedMoodFilter, setSelectedMoodFilter] = useState<string>("all");
+  const [moodDateSearch, setMoodDateSearch] = useState("");
 
   useEffect(() => {
     const syncUser = () => {
@@ -175,11 +183,46 @@ const JournalEntries = () => {
     });
   }, [entries, journalSearch]);
 
+  const moodFilterOptions = useMemo<MoodOption[]>(() => {
+    const knownMoods: MoodOption[] = moods.map((m) => ({ id: m.id, label: m.label, emoji: m.emoji }));
+    const knownMoodIds = new Set(knownMoods.map((m) => m.id));
+    const extraMoods: MoodOption[] = [];
+
+    for (const log of moodLogs) {
+      if (knownMoodIds.has(log.mood_code)) continue;
+      knownMoodIds.add(log.mood_code);
+      extraMoods.push({
+        id: log.mood_code,
+        label: log.mood_code.charAt(0).toUpperCase() + log.mood_code.slice(1),
+        emoji: "🙂",
+      });
+    }
+
+    return [...knownMoods, ...extraMoods];
+  }, [moodLogs]);
+
+  const filteredMoodLogs = useMemo(() => {
+    const selectedMood = selectedMoodFilter;
+    const q = moodDateSearch.trim().toLowerCase();
+
+    return moodLogs.filter((log) => {
+      if (selectedMood !== "all" && log.mood_code !== selectedMood) {
+        return false;
+      }
+
+      if (!q) return true;
+
+      const dateText = formatDateTime(log.logged_at).toLowerCase();
+      const isoDateText = new Date(log.logged_at).toISOString().toLowerCase();
+      return dateText.includes(q) || isoDateText.includes(q);
+    });
+  }, [moodLogs, selectedMoodFilter, moodDateSearch]);
+
   // Pagination slices
   const journalTotalPages = Math.max(1, Math.ceil(filteredEntries.length / journalPageSize));
-  const moodTotalPages = Math.max(1, Math.ceil(moodLogs.length / 10));
+  const moodTotalPages = Math.max(1, Math.ceil(filteredMoodLogs.length / 10));
   const pagedEntries = filteredEntries.slice((journalPage - 1) * journalPageSize, journalPage * journalPageSize);
-  const pagedMoods = moodLogs.slice((moodPage - 1) * 10, moodPage * 10);
+  const pagedMoods = filteredMoodLogs.slice((moodPage - 1) * 10, moodPage * 10);
 
   const handleDraftChange = (id: number, value: string) => {
     setEntries((prev) => prev.map((e) => e.id === id ? { ...e, draftContent: value } : e));
@@ -423,6 +466,58 @@ const JournalEntries = () => {
         {/* Mood Logs Tab */}
         {activeTab === "mood" && currentUser && (
           <>
+            {!isLoadingMoods && moodLogs.length > 0 && (
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Filter by mood</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedMoodFilter("all"); setMoodPage(1); }}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                        selectedMoodFilter === "all"
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-card text-foreground border-border hover:bg-muted"
+                      }`}
+                    >
+                      All moods
+                    </button>
+                    {moodFilterOptions.map((mood) => (
+                      <button
+                        key={mood.id}
+                        type="button"
+                        onClick={() => { setSelectedMoodFilter(mood.id); setMoodPage(1); }}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                          selectedMoodFilter === mood.id
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-card text-foreground border-border hover:bg-muted"
+                        }`}
+                      >
+                        <span className="mr-1">{mood.emoji}</span>
+                        {mood.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    type="text"
+                    placeholder="Search moods by date (e.g. 2026-03-28)"
+                    value={moodDateSearch}
+                    onChange={(e) => { setMoodDateSearch(e.target.value); setMoodPage(1); }}
+                    className="pl-9 h-10 rounded-xl text-sm"
+                  />
+                </div>
+                {(selectedMoodFilter !== "all" || moodDateSearch.trim()) && (
+                  <p className="text-xs text-muted-foreground">
+                    {filteredMoodLogs.length} result{filteredMoodLogs.length !== 1 ? "s" : ""}
+                    {selectedMoodFilter !== "all" ? ` for ${selectedMoodFilter}` : ""}
+                    {moodDateSearch.trim() ? ` and "${moodDateSearch.trim()}"` : ""}
+                  </p>
+                )}
+              </div>
+            )}
             {isLoadingMoods && (
               <div className="bg-card border border-border rounded-xl p-5 text-sm text-muted-foreground">Loading your mood logs...</div>
             )}
@@ -431,7 +526,12 @@ const JournalEntries = () => {
                 No mood logs found yet. Save a mood check-in from the I Need Help page.
               </div>
             )}
-            {!isLoadingMoods && moodLogs.length > 0 && (
+            {!isLoadingMoods && moodLogs.length > 0 && filteredMoodLogs.length === 0 && (
+              <div className="bg-card border border-border rounded-xl p-5 text-sm text-muted-foreground">
+                No mood logs match your current filters.
+              </div>
+            )}
+            {!isLoadingMoods && filteredMoodLogs.length > 0 && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
                 {pagedMoods.map((log) => {
                   const moodData = moods.find((m) => m.id === log.mood_code);
