@@ -24,6 +24,8 @@ const defaultAllowedOrigins = [
   "http://127.0.0.1:5173",
   "http://is401team09.us-east-2.elasticbeanstalk.com",
   "https://is401team09.us-east-2.elasticbeanstalk.com",
+  "http://www.mmmorg15.com",
+  "https://www.mmmorg15.com",
 ];
 
 const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envOrigins])];
@@ -374,6 +376,35 @@ app.delete("/api/journal-entries/:entryId", async (req, res) => {
     return res.json({ success: true });
   } catch (error) {
     return res.status(500).json({ message: "Failed to delete journal entry." });
+  }
+});
+
+app.get("/api/okr-stats", async (_req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        (SELECT COUNT(*) FROM users)::int                                              AS total_users,
+        (SELECT COUNT(*) FROM journal_entries)::int                                    AS total_entries,
+        (SELECT COUNT(DISTINCT user_id) FROM journal_entries)::int                     AS users_with_entries,
+        (SELECT COUNT(DISTINCT user_id)
+           FROM journal_entries
+          WHERE created_at >= NOW() - INTERVAL '30 days')::int                        AS active_last_30_days,
+        (SELECT COUNT(*) FROM journal_entries WHERE mood_id IS NOT NULL)::int          AS entries_with_mood
+    `);
+    const row = result.rows[0];
+    const totalUsers = row.total_users;
+    const usersWithEntries = row.users_with_entries;
+    return res.json({
+      totalUsers,
+      totalEntries: row.total_entries,
+      usersWithEntries,
+      activeLast30Days: row.active_last_30_days,
+      entriesWithMood: row.entries_with_mood,
+      activationRate: totalUsers > 0 ? Math.round((usersWithEntries / totalUsers) * 100) : 0,
+    });
+  } catch (error) {
+    console.error("OKR stats error:", error);
+    return res.status(500).json({ message: "Failed to load OKR stats." });
   }
 });
 

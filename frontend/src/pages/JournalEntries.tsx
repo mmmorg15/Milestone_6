@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Pencil, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Save, Search, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageWrapper from "@/components/PageWrapper";
+import OkrCard from "@/components/OkrCard";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { buildApiUrl } from "@/lib/api";
 
 const CURRENT_USER_KEY = "mindbridge-current-user";
-const PAGE_SIZE = 10;
+const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
 type CurrentUser = {
   id: number;
@@ -80,6 +82,8 @@ const JournalEntries = () => {
   const [isLoadingMoods, setIsLoadingMoods] = useState(false);
   const [journalPage, setJournalPage] = useState(1);
   const [moodPage, setMoodPage] = useState(1);
+  const [journalSearch, setJournalSearch] = useState("");
+  const [journalPageSize, setJournalPageSize] = useState(10);
 
   useEffect(() => {
     const syncUser = () => {
@@ -161,11 +165,21 @@ const JournalEntries = () => {
     [entries]
   );
 
+  // Search filtering
+  const filteredEntries = useMemo(() => {
+    const q = journalSearch.trim().toLowerCase();
+    if (!q) return entries;
+    return entries.filter((e) => {
+      const dateStr = formatDateTime(e.createdAt).toLowerCase() + " " + formatDateTime(e.updatedAt).toLowerCase();
+      return e.originalContent.toLowerCase().includes(q) || dateStr.includes(q);
+    });
+  }, [entries, journalSearch]);
+
   // Pagination slices
-  const journalTotalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
-  const moodTotalPages = Math.max(1, Math.ceil(moodLogs.length / PAGE_SIZE));
-  const pagedEntries = entries.slice((journalPage - 1) * PAGE_SIZE, journalPage * PAGE_SIZE);
-  const pagedMoods = moodLogs.slice((moodPage - 1) * PAGE_SIZE, moodPage * PAGE_SIZE);
+  const journalTotalPages = Math.max(1, Math.ceil(filteredEntries.length / journalPageSize));
+  const moodTotalPages = Math.max(1, Math.ceil(moodLogs.length / 10));
+  const pagedEntries = filteredEntries.slice((journalPage - 1) * journalPageSize, journalPage * journalPageSize);
+  const pagedMoods = moodLogs.slice((moodPage - 1) * 10, moodPage * 10);
 
   const handleDraftChange = (id: number, value: string) => {
     setEntries((prev) => prev.map((e) => e.id === id ? { ...e, draftContent: value } : e));
@@ -251,6 +265,8 @@ const JournalEntries = () => {
           </p>
         </div>
 
+        <OkrCard />
+
         {/* Tabs */}
         <div className="flex gap-2">
           <button
@@ -283,6 +299,43 @@ const JournalEntries = () => {
         {/* Journal Tab */}
         {activeTab === "journal" && currentUser && (
           <>
+            {/* Search and page size controls */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  type="text"
+                  placeholder="Search by content or date…"
+                  value={journalSearch}
+                  onChange={(e) => { setJournalSearch(e.target.value); setJournalPage(1); }}
+                  className="pl-9 h-10 rounded-xl text-sm"
+                />
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">Show</span>
+                <div className="flex gap-1">
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => { setJournalPageSize(size); setJournalPage(1); }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        journalPageSize === size
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">per page</span>
+              </div>
+            </div>
+            {journalSearch && (
+              <p className="text-xs text-muted-foreground">
+                {filteredEntries.length} result{filteredEntries.length !== 1 ? "s" : ""} for "{journalSearch}"
+              </p>
+            )}
             {isLoadingEntries && (
               <div className="bg-card border border-border rounded-xl p-5 text-sm text-muted-foreground">Loading your entries...</div>
             )}
@@ -291,7 +344,12 @@ const JournalEntries = () => {
                 No entries found yet. Create one from the journaling section on the I Need Help page.
               </div>
             )}
-            {!isLoadingEntries && entries.length > 0 && (
+            {!isLoadingEntries && entries.length > 0 && filteredEntries.length === 0 && (
+              <div className="bg-card border border-border rounded-xl p-5 text-sm text-muted-foreground">
+                No entries match your search.
+              </div>
+            )}
+            {!isLoadingEntries && filteredEntries.length > 0 && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                 {pagedEntries.map((entry) => {
                   const isDirty = entry.originalContent !== entry.draftContent;
